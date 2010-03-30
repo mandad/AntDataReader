@@ -1,0 +1,9 @@
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\AntDataReader.frmDisplay.resources
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\AntDataReader.Properties.Resources.resources
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\bin\Debug\AntDataReader.exe
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\bin\Debug\AntDataReader.pdb
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\AntDataReader.exe
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\AntDataReader.pdb
