@@ -37,8 +37,8 @@
             // serialPort
             // 
             this.serialPort.BaudRate = 4800;
-            this.serialPort.Handshake = System.IO.Ports.Handshake.RequestToSend;
             this.serialPort.PortName = "COM5";
+            this.serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort_DataReceived);
             // 
             // btnOpenCom
             // 
