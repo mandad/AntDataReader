@@ -32,6 +32,8 @@
             this.btnOpenCom = new System.Windows.Forms.Button();
             this.btnTest = new System.Windows.Forms.Button();
             this.lblComStatus = new System.Windows.Forms.Label();
+            this.lblChannelStatus = new System.Windows.Forms.Label();
+            this.asyncTimer = new System.Windows.Forms.Timer();
             this.SuspendLayout();
             // 
             // serialPort
@@ -54,9 +56,9 @@
             // 
             this.btnTest.Location = new System.Drawing.Point(117, 12);
             this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(75, 23);
+            this.btnTest.Size = new System.Drawing.Size(89, 23);
             this.btnTest.TabIndex = 1;
-            this.btnTest.Text = "Test Data";
+            this.btnTest.Text = "Open Channel";
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
@@ -69,11 +71,27 @@
             this.lblComStatus.TabIndex = 2;
             this.lblComStatus.Text = "Closed";
             // 
+            // lblChannelStatus
+            // 
+            this.lblChannelStatus.AutoSize = true;
+            this.lblChannelStatus.Location = new System.Drawing.Point(142, 41);
+            this.lblChannelStatus.Name = "lblChannelStatus";
+            this.lblChannelStatus.Size = new System.Drawing.Size(39, 13);
+            this.lblChannelStatus.TabIndex = 3;
+            this.lblChannelStatus.Text = "Closed";
+            this.lblChannelStatus.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // asyncTimer
+            // 
+            this.asyncTimer.Interval = 5000;
+            this.asyncTimer.Tick += new System.EventHandler(this.asyncTimer_Tick);
+            // 
             // frmDisplay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(398, 306);
+            this.Controls.Add(this.lblChannelStatus);
             this.Controls.Add(this.lblComStatus);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnOpenCom);
@@ -90,6 +108,8 @@
         private System.Windows.Forms.Button btnOpenCom;
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Label lblComStatus;
+        private System.Windows.Forms.Label lblChannelStatus;
+        private System.Windows.Forms.Timer asyncTimer;
     }
 }
 
