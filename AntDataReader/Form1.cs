@@ -19,12 +19,15 @@ namespace AntDataReader
         delegate void DisplayText(string toAdd);
         DisplayText displayText;
         bool openedOnce = false;
+        BufferedReader spBuffer;
 
         public frmDisplay()
         {
             InitializeComponent();
             updateLabel = new UpdateLabel(this.UpdateLabelFunction);
             displayText = new DisplayText(this.UpdateDisplayTextFunction);
+            
+            spBuffer = new BufferedReader(this);
 
             string[] serialPorts = System.IO.Ports.SerialPort.GetPortNames();
             cmbPort.Items.AddRange(serialPorts);
@@ -85,12 +88,10 @@ namespace AntDataReader
                         antComm.InitState = 0;  //reset the initalization sequence to the beginning
                         antComm.InitializeAntSyncronous();
                         statusCallback = new StatusCallback(this.CheckOpen);
-                        //asyncTimer.Start();
                     }
                     else    //after first initialization, it only needs to be opened
                     {
                         antComm.OpenChannel();
-                        //asyncTimer.Start();
                     }
                 }
             }
@@ -101,7 +102,6 @@ namespace AntDataReader
         {
             if (antComm.ChannelOpen)
             {
-                //asyncTimer.Stop();
                 object[] pass = new object[1];
                 pass[0] = "Open";
                 this.Invoke(this.updateLabel, pass);
@@ -109,7 +109,6 @@ namespace AntDataReader
             }
             else
             {
-                //asyncTimer.Stop();
                 object[] pass = new object[1];
                 pass[0] = "Closed";
                 this.Invoke(this.updateLabel, pass);
@@ -119,43 +118,13 @@ namespace AntDataReader
 
         private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            if (serialPort.BytesToRead >= 7)
-            {
                 byte[] readData = new byte[serialPort.BytesToRead];
                 serialPort.Read(readData, 0, serialPort.BytesToRead);
-
-                if (readData[2] == 0x40)    //status message
-                {
-                    if (readData[5] == 0)
-                    {
-                        //success message
-                        antComm.ResponseReceived = true;
-                        antComm.callFunc(); //call the async data recieved function
-                    }
-                    else
-                    {
-                        DecodeResponse(readData[4], readData[5]);
-                    }
-                }
-                else if (readData[2] == 0x4E) //broadcast data
-                {
-                    string fullText = "";
-                    for (int i = 3; i < readData.Length - 2; i++)
-                    {
-                        fullText += (char)readData[i];
-                    }
-                    RemoteDisplayUpdate(fullText);
-                    //MessageBox.Show("Data Received");
-                }
-                else
-                {
-                    RemoteDisplayUpdate("Message Id: " + readData[2].ToString("X"));   
-                }
-            }
+                spBuffer.AddNewReceived(readData);
         }
 
         /// <summary>
-        /// 
+        /// Decodes a Channel Response / Event (0x40)
         /// </summary>
         /// <param name="messageId">The message id from the response</param>
         /// <param name="messageCode">The message code from the response</param>
@@ -164,7 +133,7 @@ namespace AntDataReader
             string displayMessage;
             if (messageId == 1)
             {
-                displayMessage = "RF event";
+                displayMessage = "RF event: ";
             }
             else
             {
@@ -186,7 +155,7 @@ namespace AntDataReader
                     displayMessage += "Message Code: EVENT_RX_FAIL";
                     break;
                 default:
-                    displayMessage += "Message Code: " + messageCode.ToString("x");
+                    displayMessage += "Message Code: " + messageCode.ToString();
                     break;
             }
             RemoteDisplayUpdate(displayMessage);
@@ -218,9 +187,18 @@ namespace AntDataReader
                 }
         }
 
+        private void RemoteDisplayUpdate(string addText)
+        {
+            object[] pass = new object[1];
+            pass[0] = addText + "\r\n";
+            this.Invoke(displayText, pass);
+        }
+
         private void UpdateDisplayTextFunction(string toAdd)
         {
             txtDisplay.Text += toAdd;
+            txtDisplay.SelectionStart = txtDisplay.Text.Length;
+            txtDisplay.ScrollToCaret();
         }
 
         #endregion
@@ -233,16 +211,56 @@ namespace AntDataReader
             }
         }
 
-        private void RemoteDisplayUpdate(string addText)
-        {
-            object[] pass = new object[1];
-            pass[0] = addText + "\r\n";
-            this.Invoke(displayText, pass);
-        }
-
         private void btnClearDisplay_Click(object sender, EventArgs e)
         {
             txtDisplay.Text = "";
         }
+
+        /// <summary>
+        /// This function will be called remotely when the buffer has read a full message
+        /// </summary>
+        public void HaveMessages()
+        {
+            List<byte[]> readMessages = new List<byte[]>(spBuffer.Messages);
+            //byte[] readData = readMessages[0];
+            foreach (byte[] readData in readMessages)
+            {
+
+                if (readData[2] == 0x40)    //status message
+                {
+                    //0 = no error, 7 = channel closed
+                    if ((readData[5] == 0) || (readData[5] == 7))
+                    {
+                        //success message
+                        antComm.ResponseReceived = true;
+                        antComm.callFunc(); //call the async data recieved function
+                    }
+                    else
+                    {
+                        DecodeResponse(readData[4], readData[5]);
+                    }
+                }
+                else if (readData[2] == 0x4E) //broadcast data
+                {
+                    string fullText = "";
+                    for (int i = 4; i < readData.Length - 1; i++)
+                    {
+                        fullText += (char)readData[i];
+                    }
+                    RemoteDisplayUpdate(fullText);
+                }
+                else
+                {
+                    RemoteDisplayUpdate("Message Id: " + readData[2].ToString("X"));
+                }
+            }
+        }
+
+        private void frmDisplay_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            antComm.CloseChannel();
+        }
+
+
     }
 }

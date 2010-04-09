@@ -85,15 +85,12 @@ namespace AntDataReader
                 case 2:
                     SendCommand(ANTCommands.AssignChannel());
                     needsResponse = true;
-                    //waitTimer.Start();
                     break;
                 case 3:
                     SendCommand(ANTCommands.SetChannelId());
-                    //waitTimer.Start();
                     break;
                 case 4:
                     SendCommand(ANTCommands.OpenChannel());
-                    //waitTimer.Start();
                     break;
                 case 5:
                     channelOpen = true;
@@ -113,7 +110,6 @@ namespace AntDataReader
             {
                 callFunc = new ContinuationCallback(this.OpenChannel);
                 SendCommand(ANTCommands.OpenChannel());
-                //waitTimer.Start();
             }
             else if (state == 2)
             {
@@ -140,7 +136,7 @@ namespace AntDataReader
                 callFunc = new ContinuationCallback(this.CloseChannel);
                 SendCommand(ANTCommands.CloseChannel());
             }
-            else if (state == 2)
+            else if (state == 2)    //gets back an EVENT_CHANNEL_CLOSED as well
             {
                 channelOpen = false;
                 parent.statusCallback();

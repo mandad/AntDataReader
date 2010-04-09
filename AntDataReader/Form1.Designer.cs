@@ -77,7 +77,7 @@
             // lblChannelStatus
             // 
             this.lblChannelStatus.AutoSize = true;
-            this.lblChannelStatus.Location = new System.Drawing.Point(170, 41);
+            this.lblChannelStatus.Location = new System.Drawing.Point(169, 38);
             this.lblChannelStatus.Name = "lblChannelStatus";
             this.lblChannelStatus.Size = new System.Drawing.Size(39, 13);
             this.lblChannelStatus.TabIndex = 3;
@@ -136,6 +136,7 @@
             this.Controls.Add(this.btnOpenCom);
             this.Name = "frmDisplay";
             this.Text = "ANT Data Reciever";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmDisplay_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

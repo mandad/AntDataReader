@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="ANTCommands.cs" />
     <Compile Include="ANTCommunication.cs" />
+    <Compile Include="BufferedReader.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
