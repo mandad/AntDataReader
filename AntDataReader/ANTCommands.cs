@@ -7,6 +7,8 @@ namespace AntDataReader
 {
     static class ANTCommands
     {
+        const byte channelNum = 0x00;
+
         #region Utility Functions
 
         /// <summary>
@@ -43,9 +45,9 @@ namespace AntDataReader
         {
             byte[] data = BasicData(3);
             data[2] = 0x42; //msg id (assign channel)
-            data[3] = 0x00; //channel number
-            data[4] = 0x00; //channel type
-            data[5] = 0x00; //channel number (default public)
+            data[3] = channelNum; //channel number
+            data[4] = 0x40; //channel type = unidirectional receive only
+            data[5] = 0x00; //network number (default public)
             data [6] = GetChecksum(data);
 
             return data;
@@ -55,11 +57,11 @@ namespace AntDataReader
         {
             byte[] message = BasicData(5);
             message[2] = 0x51;
-            message[3] = 0x00;  //channel number
+            message[3] = channelNum;  //channel number
             message[4] = 0x00;  //device number LSB (0 = slave)
             message[5] = 0x00;  //device number MSB
             message[6] = 0x00;  //pairing request & device type (0 = match any)
-            message[7] = 0x00;  //transmissing type (0 = receive any)
+            message[7] = 0x00;  //transmission type (0 = receive any)
             message[8] = GetChecksum(message);
 
             return message;
@@ -69,7 +71,7 @@ namespace AntDataReader
         {
             byte[] message = BasicData(1);
             message[2] = 0x4A;
-            message[3] = 0x00;  //channel number
+            message[3] = 0x00;
             message[4] = GetChecksum(message);
 
             return message;
@@ -79,7 +81,17 @@ namespace AntDataReader
         {
             byte[] message = BasicData(1);
             message[2] = 0x4B;
-            message[3] = 0x00;  //channel number
+            message[3] = channelNum;  //channel number
+            message[4] = GetChecksum(message);
+
+            return message;
+        }
+
+        public static byte[] CloseChannel()
+        {
+            byte[] message = BasicData(1);
+            message[2] = 0x4C;
+            message[3] = channelNum;
             message[4] = GetChecksum(message);
 
             return message;

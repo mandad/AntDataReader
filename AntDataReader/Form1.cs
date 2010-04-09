@@ -12,16 +12,24 @@ namespace AntDataReader
     public partial class frmDisplay : Form
     {
         ANTCommunication antComm;
-        delegate void StatusCallback();
-        StatusCallback statusCallback;
+        public delegate void StatusCallback();
+        public StatusCallback statusCallback;
         delegate void UpdateLabel(string newText);
         UpdateLabel updateLabel;
+        delegate void DisplayText(string toAdd);
+        DisplayText displayText;
         bool openedOnce = false;
 
         public frmDisplay()
         {
             InitializeComponent();
             updateLabel = new UpdateLabel(this.UpdateLabelFunction);
+            displayText = new DisplayText(this.UpdateDisplayTextFunction);
+
+            string[] serialPorts = System.IO.Ports.SerialPort.GetPortNames();
+            cmbPort.Items.AddRange(serialPorts);
+            cmbPort.SelectedIndex = 0;
+            serialPort.PortName = cmbPort.Text;
         }
 
         private void btnOpenCom_Click(object sender, EventArgs e)
@@ -39,8 +47,8 @@ namespace AntDataReader
                 if (serialPort.IsOpen)
                 {
                     lblComStatus.Text = "Open";
-                    btnOpenCom.Text = "Close COM5";
-                    antComm = new ANTCommunication(ref serialPort);
+                    btnOpenCom.Text = "Close COM";
+                    antComm = new ANTCommunication(ref serialPort, this);
                 }
             }
             else
@@ -56,7 +64,7 @@ namespace AntDataReader
                 if (!serialPort.IsOpen)
                 {
                     lblComStatus.Text = "Closed";
-                    btnOpenCom.Text = "Open COM5";
+                    btnOpenCom.Text = "Open COM";
                     antComm = null;
                 }
             }
@@ -66,16 +74,24 @@ namespace AntDataReader
         {
             if (antComm != null)
             {
-                if (!openedOnce)
-                {
-                    antComm.InitializeAntSyncronous();
-                    statusCallback = new StatusCallback(this.CheckOpen);
-                    asyncTimer.Start();
+                if (antComm.ChannelOpen)
+                {   //close the channel
+                    antComm.CloseChannel();
                 }
                 else
-                {
-                    antComm.OpenChannel();
-                    asyncTimer.Start();
+                {   //open the channel
+                    if (!openedOnce)
+                    {
+                        antComm.InitState = 0;  //reset the initalization sequence to the beginning
+                        antComm.InitializeAntSyncronous();
+                        statusCallback = new StatusCallback(this.CheckOpen);
+                        //asyncTimer.Start();
+                    }
+                    else    //after first initialization, it only needs to be opened
+                    {
+                        antComm.OpenChannel();
+                        //asyncTimer.Start();
+                    }
                 }
             }
 
@@ -85,12 +101,18 @@ namespace AntDataReader
         {
             if (antComm.ChannelOpen)
             {
-                lblChannelStatus.Text = "Open";
+                //asyncTimer.Stop();
+                object[] pass = new object[1];
+                pass[0] = "Open";
+                this.Invoke(this.updateLabel, pass);
                 openedOnce = true;
             }
             else
             {
-                asyncTimer.Start(); //check again
+                //asyncTimer.Stop();
+                object[] pass = new object[1];
+                pass[0] = "Closed";
+                this.Invoke(this.updateLabel, pass);
             }
         }
 
@@ -108,30 +130,45 @@ namespace AntDataReader
                     {
                         //success message
                         antComm.ResponseReceived = true;
+                        antComm.callFunc(); //call the async data recieved function
                     }
                     else
                     {
                         DecodeResponse(readData[4], readData[5]);
                     }
-                    //broadcast data
                 }
                 else if (readData[2] == 0x4E) //broadcast data
                 {
-                    MessageBox.Show("Data Received");
+                    string fullText = "";
+                    for (int i = 3; i < readData.Length - 2; i++)
+                    {
+                        fullText += (char)readData[i];
+                    }
+                    RemoteDisplayUpdate(fullText);
+                    //MessageBox.Show("Data Received");
+                }
+                else
+                {
+                    RemoteDisplayUpdate("Message Id: " + readData[2].ToString("X"));   
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="messageId">The message id from the response</param>
+        /// <param name="messageCode">The message code from the response</param>
         private void DecodeResponse(byte messageId, byte messageCode)
         {
             string displayMessage;
             if (messageId == 1)
             {
-                displayMessage = "RF event\n";
+                displayMessage = "RF event";
             }
             else
             {
-                displayMessage = "Message ID: " + messageId.ToString() + "\n";
+                displayMessage = "Message ID: " + messageId.ToString();
             }
             switch (messageCode)
             {
@@ -145,11 +182,15 @@ namespace AntDataReader
                     pass[0] = "Closed";
                     this.Invoke(this.updateLabel, pass);
                     break;
+                case 2:
+                    displayMessage += "Message Code: EVENT_RX_FAIL";
+                    break;
                 default:
-                    displayMessage += "Message Code: " + messageCode.ToString();
+                    displayMessage += "Message Code: " + messageCode.ToString("x");
                     break;
             }
-            MessageBox.Show(displayMessage, "Message Recieved", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            RemoteDisplayUpdate(displayMessage);
+            //MessageBox.Show(displayMessage, "Message Recieved", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
         private void asyncTimer_Tick(object sender, EventArgs e)
@@ -161,9 +202,47 @@ namespace AntDataReader
             }
         }
 
+        #region UI Delegates
+
         private void UpdateLabelFunction(string newText)
         {
-            lblChannelStatus.Text = newText;
+                lblChannelStatus.Text = newText;
+                //Switch the button
+                if (newText == "Open")
+                {
+                    btnOpenChannel.Text = "Close Channel";
+                }
+                else
+                {
+                    btnOpenChannel.Text = "Open Channel";
+                }
+        }
+
+        private void UpdateDisplayTextFunction(string toAdd)
+        {
+            txtDisplay.Text += toAdd;
+        }
+
+        #endregion
+
+        private void cmbPort_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            if (!serialPort.IsOpen)
+            {
+                serialPort.PortName = cmbPort.SelectedItem.ToString();
+            }
+        }
+
+        private void RemoteDisplayUpdate(string addText)
+        {
+            object[] pass = new object[1];
+            pass[0] = addText + "\r\n";
+            this.Invoke(displayText, pass);
+        }
+
+        private void btnClearDisplay_Click(object sender, EventArgs e)
+        {
+            txtDisplay.Text = "";
         }
     }
 }

@@ -12,9 +12,12 @@ namespace AntDataReader
         System.Timers.Timer waitTimer;
         bool responseReceived = false;
         bool channelOpen = false;
+        bool needsResponse = true;
         int state = 0;
-        delegate void ContinuationCallback();
-        ContinuationCallback callFunc;
+        public delegate void ContinuationCallback();
+        public ContinuationCallback callFunc;
+        Dictionary<byte, string> responseCodes;
+        frmDisplay parent;
 
         public bool ResponseReceived
         {
@@ -26,16 +29,33 @@ namespace AntDataReader
             get { return channelOpen; }
         }
 
-        public ANTCommunication(ref SerialPort spSet)
+        public int InitState
+        {
+            get { return state; }
+            set { state = value; }
+        }
+
+        public ANTCommunication(ref SerialPort spSet, frmDisplay parentForm)
         {
             sp = spSet;
             waitTimer = new System.Timers.Timer(500);
             waitTimer.Elapsed += new System.Timers.ElapsedEventHandler(waitTimer_Elapsed);
+            parent = parentForm;
+            //responseCodes = GetResponseCodes();
+        }
+
+        /// <summary>
+        /// Fills a dictionary with keys of response message codes and values of their description
+        /// </summary>
+        /// <returns>the filled dictionary</returns>
+        private Dictionary<byte, string> GetResponseCodes()
+        {
+            throw new NotImplementedException();
         }
 
         void waitTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (responseReceived)
+            if (responseReceived || !needsResponse)
             {
                 responseReceived = false;
                 waitTimer.Stop();
@@ -48,6 +68,9 @@ namespace AntDataReader
 
         }
 
+        /// <summary>
+        /// Gets called repeatedly to sequence
+        /// </summary>
         public void InitializeAntSyncronous()
         {
             state++;
@@ -55,20 +78,26 @@ namespace AntDataReader
             {
                 case 1:
                     callFunc = new ContinuationCallback(this.InitializeAntSyncronous);
-                    SendCommand(ANTCommands.Reset());   //no response
-                    SendCommand(ANTCommands.AssignChannel());
+                    SendCommand(ANTCommands.Reset());   //no response on AP1
+                    needsResponse = false;
                     waitTimer.Start();
                     break;
                 case 2:
-                    SendCommand(ANTCommands.SetChannelId());
-                    waitTimer.Start();
+                    SendCommand(ANTCommands.AssignChannel());
+                    needsResponse = true;
+                    //waitTimer.Start();
                     break;
                 case 3:
-                    SendCommand(ANTCommands.OpenChannel());
-                    waitTimer.Start();
+                    SendCommand(ANTCommands.SetChannelId());
+                    //waitTimer.Start();
                     break;
                 case 4:
+                    SendCommand(ANTCommands.OpenChannel());
+                    //waitTimer.Start();
+                    break;
+                case 5:
                     channelOpen = true;
+                    parent.statusCallback();
                     state = 0;
                     break;
             }
@@ -84,20 +113,39 @@ namespace AntDataReader
             {
                 callFunc = new ContinuationCallback(this.OpenChannel);
                 SendCommand(ANTCommands.OpenChannel());
-                waitTimer.Start();
+                //waitTimer.Start();
             }
             else if (state == 2)
             {
                 channelOpen = true;
+                parent.statusCallback();
                 state = 0;
             }
         }
 
+        /// <summary>
+        /// Wites a command array to the serial port
+        /// </summary>
+        /// <param name="message">The message to send</param>
         private void SendCommand(byte[] message)
         {
             sp.Write(message, 0, message.Length);
         }
 
-
+        public void CloseChannel()
+        {
+            state++;
+            if (state == 1)
+            {
+                callFunc = new ContinuationCallback(this.CloseChannel);
+                SendCommand(ANTCommands.CloseChannel());
+            }
+            else if (state == 2)
+            {
+                channelOpen = false;
+                parent.statusCallback();
+                state = 0;
+            }
+        }
     }
 }
