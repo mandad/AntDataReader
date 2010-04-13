@@ -42,6 +42,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.cbAscii = new System.Windows.Forms.CheckBox();
+            this.btnReset = new System.Windows.Forms.Button();
+            this.cbDebugMode = new System.Windows.Forms.CheckBox();
+            this.cbAutoClear = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // serialPort
@@ -147,6 +150,7 @@
             this.cmbBaudRate.Name = "cmbBaudRate";
             this.cmbBaudRate.Size = new System.Drawing.Size(105, 21);
             this.cmbBaudRate.TabIndex = 8;
+            this.cmbBaudRate.SelectionChangeCommitted += new System.EventHandler(this.cmbBaudRate_SelectionChangeCommitted);
             // 
             // label1
             // 
@@ -174,14 +178,52 @@
             this.cbAscii.Size = new System.Drawing.Size(90, 17);
             this.cbAscii.TabIndex = 11;
             this.cbAscii.Text = "ASCII Display";
+            this.cbAscii.ThreeState = true;
             this.cbAscii.UseVisualStyleBackColor = true;
-            this.cbAscii.CheckedChanged += new System.EventHandler(this.cbAscii_CheckedChanged);
+            this.cbAscii.CheckStateChanged += new System.EventHandler(this.cbAscii_CheckStateChanged);
+            // 
+            // btnReset
+            // 
+            this.btnReset.Location = new System.Drawing.Point(392, 12);
+            this.btnReset.Name = "btnReset";
+            this.btnReset.Size = new System.Drawing.Size(82, 23);
+            this.btnReset.TabIndex = 12;
+            this.btnReset.Text = "Reset ANT";
+            this.btnReset.UseVisualStyleBackColor = true;
+            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            // 
+            // cbDebugMode
+            // 
+            this.cbDebugMode.AutoSize = true;
+            this.cbDebugMode.Checked = true;
+            this.cbDebugMode.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbDebugMode.Location = new System.Drawing.Point(110, 108);
+            this.cbDebugMode.Name = "cbDebugMode";
+            this.cbDebugMode.Size = new System.Drawing.Size(88, 17);
+            this.cbDebugMode.TabIndex = 13;
+            this.cbDebugMode.Text = "Debug Mode";
+            this.cbDebugMode.UseVisualStyleBackColor = true;
+            this.cbDebugMode.CheckedChanged += new System.EventHandler(this.cbDebugMode_CheckedChanged);
+            // 
+            // cbAutoClear
+            // 
+            this.cbAutoClear.AutoSize = true;
+            this.cbAutoClear.Location = new System.Drawing.Point(324, 106);
+            this.cbAutoClear.Name = "cbAutoClear";
+            this.cbAutoClear.Size = new System.Drawing.Size(75, 17);
+            this.cbAutoClear.TabIndex = 14;
+            this.cbAutoClear.Text = "Auto Clear";
+            this.cbAutoClear.UseVisualStyleBackColor = true;
+            this.cbAutoClear.CheckedChanged += new System.EventHandler(this.cbAutoClear_CheckedChanged);
             // 
             // frmDisplay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(499, 464);
+            this.Controls.Add(this.cbAutoClear);
+            this.Controls.Add(this.cbDebugMode);
+            this.Controls.Add(this.btnReset);
             this.Controls.Add(this.cbAscii);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -218,6 +260,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox cbAscii;
+        private System.Windows.Forms.Button btnReset;
+        private System.Windows.Forms.CheckBox cbDebugMode;
+        private System.Windows.Forms.CheckBox cbAutoClear;
     }
 }
 

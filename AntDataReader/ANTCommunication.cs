@@ -178,5 +178,10 @@ namespace AntDataReader
                     break;
             }
         }
+
+        public void ResetANT()
+        {
+            SendCommand(ANTCommands.Reset());
+        }
     }
 }

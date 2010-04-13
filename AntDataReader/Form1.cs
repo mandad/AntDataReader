@@ -20,7 +20,9 @@ namespace AntDataReader
         DisplayText displayText;
         bool openedOnce = false;
         BufferedReader spBuffer;
-        bool asciiMode = false;
+        int asciiMode = 0;
+        bool debugMode = true;
+        bool autoClear = false;
 
         public frmDisplay()
         {
@@ -33,6 +35,7 @@ namespace AntDataReader
             string[] serialPorts = System.IO.Ports.SerialPort.GetPortNames();
             cmbPort.Items.AddRange(serialPorts);
             cmbPort.SelectedIndex = 0;
+            cmbBaudRate.SelectedIndex = 1;
             serialPort.PortName = cmbPort.Text;
         }
 
@@ -107,7 +110,6 @@ namespace AntDataReader
             }
 
             RemoteDisplayUpdate(displayMessage);
-            //MessageBox.Show(displayMessage, "Message Recieved", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
 
@@ -120,19 +122,23 @@ namespace AntDataReader
             //Switch the button
             if (newText == "Open")
             {
-                btnOpenChannel.Text = "Close Channel";
+                btnOpenChannel.Text = btnScanMode.Text = "Close Channel"; 
             }
             else
             {
                 btnOpenChannel.Text = "Open Channel";
+                btnScanMode.Text = "Open RX Scan Mode";
             }
         }
 
         private void RemoteDisplayUpdate(string addText)
         {
-            object[] pass = new object[1];
-            pass[0] = addText + "\r\n";
-            this.Invoke(displayText, pass);
+            if (!this.IsDisposed)
+            {
+                object[] pass = new object[1];
+                pass[0] = addText + "\r\n";
+                this.Invoke(displayText, pass);
+            }
         }
 
         private void UpdateDisplayTextFunction(string toAdd)
@@ -140,6 +146,7 @@ namespace AntDataReader
             txtDisplay.Text += toAdd;
             txtDisplay.SelectionStart = txtDisplay.Text.Length;
             txtDisplay.ScrollToCaret();
+            //if (autoClear && txtDisplay.SelectionStart
         }
 
         #endregion
@@ -256,7 +263,50 @@ namespace AntDataReader
             }
         }
 
-        #endregion
+        private void cbAscii_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (cbAscii.CheckState == CheckState.Checked)
+            {
+                asciiMode = 2;
+            }
+            else if (cbAscii.CheckState == CheckState.Indeterminate)
+            {
+                asciiMode = 1;
+            }
+            else
+            {
+                asciiMode = 0;
+            }
+        }
+
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            if (antComm != null)
+            {
+                antComm.ResetANT();
+            }
+        }
+
+        private void cmbBaudRate_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            if (!serialPort.IsOpen)
+            {
+                serialPort.BaudRate = Convert.ToInt32(cmbBaudRate.SelectedItem);
+            }
+        }
+
+        private void cbDebugMode_CheckedChanged(object sender, EventArgs e)
+        {
+            debugMode = cbDebugMode.Checked;
+        }
+
+        private void cbAutoClear_CheckedChanged(object sender, EventArgs e)
+        {
+            autoClear = cbAutoClear.Checked;
+        }
+
+        #endregion  //UI Event Handlers
 
         /// <summary>
         /// This function will be called remotely when the buffer has read a full message
@@ -279,9 +329,12 @@ namespace AntDataReader
                         {
                             antComm.callFunc(); //call the async data recieved function
                         }
-                        DecodeResponse(readData[4], readData[5]);
+                        if (debugMode)
+                        {
+                            DecodeResponse(readData[4], readData[5]);
+                        }
                     }
-                    else
+                    else if (debugMode)
                     {
                         DecodeResponse(readData[4], readData[5]);
                     }
@@ -289,7 +342,10 @@ namespace AntDataReader
                 else if (readData[2] == 0x6F)
                 {
                     //startup message (AP2 only)
-                    RemoteDisplayUpdate("Message Id: " + readData[2].ToString("X"));
+                    if (debugMode)
+                    {
+                        RemoteDisplayUpdate("Startup message: " + readData[3].ToString("X"));
+                    }
                     antComm.ResponseReceived = true;
                     if (antComm.callFunc != null)
                     {
@@ -301,28 +357,34 @@ namespace AntDataReader
                     string fullText = "";
                     for (int i = 4; i < readData.Length - 1; i++)
                     {
-                        if (asciiMode)
+                        if (asciiMode == 2)
                         {
-                            fullText += (char)readData[i];
+                            if (readData[i] != 0)
+                            {
+                                fullText += (char)readData[i];
+                            }
+                            else
+                            {
+                                fullText += "N0 ";
+                            }
                         }
-                        else
+                        else if (asciiMode == 1) {
+                            fullText += readData[i].ToString("D") + " ";
+                        }
+                        else 
                         {
                             fullText += readData[i].ToString("X") + " ";
                         }
                     }
                     RemoteDisplayUpdate(fullText);
                 }
-                else
+                else if (debugMode)
                 {
                     RemoteDisplayUpdate("Message Id: " + readData[2].ToString("X"));
                 }
             }
         }
 
-        private void cbAscii_CheckedChanged(object sender, EventArgs e)
-        {
-            asciiMode = cbAscii.Checked;
-        }
 
 
 
