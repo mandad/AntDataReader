@@ -97,6 +97,28 @@ namespace AntDataReader
             return message;
         }
 
+        public static byte[] OpenRxScanMode()
+        {
+            byte[] message = BasicData(1);
+            message[2] = 0x5B;
+            message[3] = channelNum;
+            message[4] = GetChecksum(message);
+
+            return message;
+        }
+
+        public static byte[] SetChannelPeriod()
+        {
+            byte[] message = BasicData(3);
+            message[2] = 0x43;
+            message[3] = channelNum;
+            message[4] = 0x0F;
+            message[5] = 0x00;
+            message[6] = GetChecksum(message);
+
+            return message;
+        }
+
         #endregion
     }
 }

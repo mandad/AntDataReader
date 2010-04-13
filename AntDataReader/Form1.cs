@@ -20,13 +20,14 @@ namespace AntDataReader
         DisplayText displayText;
         bool openedOnce = false;
         BufferedReader spBuffer;
+        bool asciiMode = false;
 
         public frmDisplay()
         {
             InitializeComponent();
             updateLabel = new UpdateLabel(this.UpdateLabelFunction);
             displayText = new DisplayText(this.UpdateDisplayTextFunction);
-            
+
             spBuffer = new BufferedReader(this);
 
             string[] serialPorts = System.IO.Ports.SerialPort.GetPortNames();
@@ -34,6 +35,116 @@ namespace AntDataReader
             cmbPort.SelectedIndex = 0;
             serialPort.PortName = cmbPort.Text;
         }
+
+        private void CheckOpen()
+        {
+            if (antComm.ChannelOpen)
+            {
+                object[] pass = new object[1];
+                pass[0] = "Open";
+                this.Invoke(this.updateLabel, pass);
+                openedOnce = true;
+            }
+            else
+            {
+                if (!this.IsDisposed)
+                {
+                    object[] pass = new object[1];
+                    pass[0] = "Closed";
+                    this.Invoke(this.updateLabel, pass);
+                }
+            }
+        }
+
+
+        private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            byte[] readData = new byte[serialPort.BytesToRead];
+            serialPort.Read(readData, 0, serialPort.BytesToRead);
+            spBuffer.AddNewReceived(readData);
+        }
+
+        /// <summary>
+        /// Decodes a Channel Response / Event (0x40)
+        /// </summary>
+        /// <param name="messageId">The message id from the response</param>
+        /// <param name="messageCode">The message code from the response</param>
+        private void DecodeResponse(byte messageId, byte messageCode)
+        {
+            string displayMessage;
+            if (messageId == 1)
+            {
+                displayMessage = "RF event - Message Code: ";
+            }
+            else
+            {
+                displayMessage = "Message ID: " + messageId.ToString("X") + " - Message Code: ";
+            }
+            switch (messageCode)
+            {
+                case 0:
+                    displayMessage += "RESPONSE_NO_ERROR";
+                    break;
+                case 1:
+                    displayMessage += "EVENT_RX_SEARCH_TIMEOUT";
+                    //this event is raised in another thread, so we have to use invoke on a delegate
+                    object[] pass = new object[1];
+                    pass[0] = "Closed";
+                    this.Invoke(this.updateLabel, pass);
+                    break;
+                case 2:
+                    displayMessage += "EVENT_RX_FAIL";
+                    break;
+                case 7:
+                    displayMessage += "EVENT_CHANNEL_CLOSED";
+                    break;
+                case 8:
+                    displayMessage += "EVENT_RX_FAIL_GO_TO_SEARCH";
+                    break;
+                default:
+                    displayMessage += "Message Code: " + messageCode.ToString();
+                    break;
+            }
+
+            RemoteDisplayUpdate(displayMessage);
+            //MessageBox.Show(displayMessage, "Message Recieved", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+
+
+
+        #region UI Delegates
+
+        private void UpdateLabelFunction(string newText)
+        {
+            lblChannelStatus.Text = newText;
+            //Switch the button
+            if (newText == "Open")
+            {
+                btnOpenChannel.Text = "Close Channel";
+            }
+            else
+            {
+                btnOpenChannel.Text = "Open Channel";
+            }
+        }
+
+        private void RemoteDisplayUpdate(string addText)
+        {
+            object[] pass = new object[1];
+            pass[0] = addText + "\r\n";
+            this.Invoke(displayText, pass);
+        }
+
+        private void UpdateDisplayTextFunction(string toAdd)
+        {
+            txtDisplay.Text += toAdd;
+            txtDisplay.SelectionStart = txtDisplay.Text.Length;
+            txtDisplay.ScrollToCaret();
+        }
+
+        #endregion
+
+        #region UI Event Handlers
 
         private void btnOpenCom_Click(object sender, EventArgs e)
         {
@@ -98,111 +209,6 @@ namespace AntDataReader
 
         }
 
-        private void CheckOpen()
-        {
-            if (antComm.ChannelOpen)
-            {
-                object[] pass = new object[1];
-                pass[0] = "Open";
-                this.Invoke(this.updateLabel, pass);
-                openedOnce = true;
-            }
-            else
-            {
-                object[] pass = new object[1];
-                pass[0] = "Closed";
-                this.Invoke(this.updateLabel, pass);
-            }
-        }
-
-
-        private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        {
-                byte[] readData = new byte[serialPort.BytesToRead];
-                serialPort.Read(readData, 0, serialPort.BytesToRead);
-                spBuffer.AddNewReceived(readData);
-        }
-
-        /// <summary>
-        /// Decodes a Channel Response / Event (0x40)
-        /// </summary>
-        /// <param name="messageId">The message id from the response</param>
-        /// <param name="messageCode">The message code from the response</param>
-        private void DecodeResponse(byte messageId, byte messageCode)
-        {
-            string displayMessage;
-            if (messageId == 1)
-            {
-                displayMessage = "RF event: ";
-            }
-            else
-            {
-                displayMessage = "Message ID: " + messageId.ToString();
-            }
-            switch (messageCode)
-            {
-                case 0:
-                    displayMessage += "Message Code: RESPONSE_NO_ERROR";
-                    break;
-                case 1:
-                    displayMessage += "Message Code: EVENT_RX_SEARCH_TIMEOUT";
-                    //this event is raised in another thread, so we have to use invoke on a delegate
-                    object[] pass = new object[1];
-                    pass[0] = "Closed";
-                    this.Invoke(this.updateLabel, pass);
-                    break;
-                case 2:
-                    displayMessage += "Message Code: EVENT_RX_FAIL";
-                    break;
-                default:
-                    displayMessage += "Message Code: " + messageCode.ToString();
-                    break;
-            }
-            RemoteDisplayUpdate(displayMessage);
-            //MessageBox.Show(displayMessage, "Message Recieved", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-        }
-
-        private void asyncTimer_Tick(object sender, EventArgs e)
-        {
-            asyncTimer.Stop();
-            if (statusCallback != null)
-            {
-                statusCallback();
-            }
-        }
-
-        #region UI Delegates
-
-        private void UpdateLabelFunction(string newText)
-        {
-                lblChannelStatus.Text = newText;
-                //Switch the button
-                if (newText == "Open")
-                {
-                    btnOpenChannel.Text = "Close Channel";
-                }
-                else
-                {
-                    btnOpenChannel.Text = "Open Channel";
-                }
-        }
-
-        private void RemoteDisplayUpdate(string addText)
-        {
-            object[] pass = new object[1];
-            pass[0] = addText + "\r\n";
-            this.Invoke(displayText, pass);
-        }
-
-        private void UpdateDisplayTextFunction(string toAdd)
-        {
-            txtDisplay.Text += toAdd;
-            txtDisplay.SelectionStart = txtDisplay.Text.Length;
-            txtDisplay.ScrollToCaret();
-        }
-
-        #endregion
-
         private void cmbPort_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (!serialPort.IsOpen)
@@ -215,6 +221,42 @@ namespace AntDataReader
         {
             txtDisplay.Text = "";
         }
+
+        private void frmDisplay_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (antComm != null)
+            {
+                antComm.CloseChannel();
+            }
+        }
+
+        private void btnScanMode_Click(object sender, EventArgs e)
+        {
+            if (antComm != null)
+            {
+                if (antComm.ChannelOpen)
+                {   //close the channel
+                    antComm.CloseChannel();
+                }
+                else
+                {   //open the channel
+                    antComm.InitState = 0;  //reset the initalization sequence to the beginning
+                    statusCallback = new StatusCallback(this.CheckOpen);
+                    antComm.RxScanMode();
+                }
+            }
+        }
+
+        private void asyncTimer_Tick(object sender, EventArgs e)
+        {
+            asyncTimer.Stop();
+            if (statusCallback != null)
+            {
+                statusCallback();
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// This function will be called remotely when the buffer has read a full message
@@ -233,11 +275,25 @@ namespace AntDataReader
                     {
                         //success message
                         antComm.ResponseReceived = true;
-                        antComm.callFunc(); //call the async data recieved function
+                        if (antComm.callFunc != null)
+                        {
+                            antComm.callFunc(); //call the async data recieved function
+                        }
+                        DecodeResponse(readData[4], readData[5]);
                     }
                     else
                     {
                         DecodeResponse(readData[4], readData[5]);
+                    }
+                }
+                else if (readData[2] == 0x6F)
+                {
+                    //startup message (AP2 only)
+                    RemoteDisplayUpdate("Message Id: " + readData[2].ToString("X"));
+                    antComm.ResponseReceived = true;
+                    if (antComm.callFunc != null)
+                    {
+                        antComm.callFunc();
                     }
                 }
                 else if (readData[2] == 0x4E) //broadcast data
@@ -245,7 +301,14 @@ namespace AntDataReader
                     string fullText = "";
                     for (int i = 4; i < readData.Length - 1; i++)
                     {
-                        fullText += (char)readData[i];
+                        if (asciiMode)
+                        {
+                            fullText += (char)readData[i];
+                        }
+                        else
+                        {
+                            fullText += readData[i].ToString("X") + " ";
+                        }
                     }
                     RemoteDisplayUpdate(fullText);
                 }
@@ -256,10 +319,12 @@ namespace AntDataReader
             }
         }
 
-        private void frmDisplay_FormClosing(object sender, FormClosingEventArgs e)
+        private void cbAscii_CheckedChanged(object sender, EventArgs e)
         {
-            antComm.CloseChannel();
+            asciiMode = cbAscii.Checked;
         }
+
+
 
 
     }

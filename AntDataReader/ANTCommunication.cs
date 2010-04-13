@@ -83,17 +83,21 @@ namespace AntDataReader
                     waitTimer.Start();
                     break;
                 case 2:
-                    SendCommand(ANTCommands.AssignChannel());
                     needsResponse = true;
+                    SendCommand(ANTCommands.AssignChannel());
                     break;
                 case 3:
                     SendCommand(ANTCommands.SetChannelId());
                     break;
                 case 4:
-                    SendCommand(ANTCommands.OpenChannel());
+                    SendCommand(ANTCommands.SetChannelPeriod());
                     break;
                 case 5:
+                    SendCommand(ANTCommands.OpenChannel());
+                    break;
+                case 6:
                     channelOpen = true;
+                    callFunc = null;
                     parent.statusCallback();
                     state = 0;
                     break;
@@ -114,6 +118,7 @@ namespace AntDataReader
             else if (state == 2)
             {
                 channelOpen = true;
+                callFunc = null;
                 parent.statusCallback();
                 state = 0;
             }
@@ -139,8 +144,38 @@ namespace AntDataReader
             else if (state == 2)    //gets back an EVENT_CHANNEL_CLOSED as well
             {
                 channelOpen = false;
+                callFunc = null;
                 parent.statusCallback();
                 state = 0;
+            }
+        }
+
+        public void RxScanMode()
+        {
+
+            state++;
+            switch (state)
+            {
+                case 1:
+                    callFunc = new ContinuationCallback(this.RxScanMode);
+                    needsResponse = true;
+                    SendCommand(ANTCommands.Reset());
+                    break;
+                case 2:
+                    SendCommand(ANTCommands.AssignChannel());
+                    break;
+                case 3:
+                    SendCommand(ANTCommands.SetChannelId());
+                    break;
+                case 4:
+                    SendCommand(ANTCommands.OpenRxScanMode());
+                    break;
+                case 5:
+                    channelOpen = true;
+                    callFunc = null;
+                    parent.statusCallback();
+                    state = 0;
+                    break;
             }
         }
     }

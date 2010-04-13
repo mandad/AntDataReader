@@ -37,11 +37,16 @@
             this.cmbPort = new System.Windows.Forms.ComboBox();
             this.txtDisplay = new System.Windows.Forms.TextBox();
             this.btnClearDisplay = new System.Windows.Forms.Button();
+            this.btnScanMode = new System.Windows.Forms.Button();
+            this.cmbBaudRate = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cbAscii = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // serialPort
             // 
-            this.serialPort.BaudRate = 4800;
+            this.serialPort.BaudRate = 57600;
             this.serialPort.PortName = "COM5";
             this.serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort_DataReceived);
             // 
@@ -57,7 +62,7 @@
             // 
             // btnOpenChannel
             // 
-            this.btnOpenChannel.Location = new System.Drawing.Point(145, 12);
+            this.btnOpenChannel.Location = new System.Drawing.Point(123, 12);
             this.btnOpenChannel.Name = "btnOpenChannel";
             this.btnOpenChannel.Size = new System.Drawing.Size(89, 23);
             this.btnOpenChannel.TabIndex = 1;
@@ -77,7 +82,7 @@
             // lblChannelStatus
             // 
             this.lblChannelStatus.AutoSize = true;
-            this.lblChannelStatus.Location = new System.Drawing.Point(169, 38);
+            this.lblChannelStatus.Location = new System.Drawing.Point(206, 41);
             this.lblChannelStatus.Name = "lblChannelStatus";
             this.lblChannelStatus.Size = new System.Drawing.Size(39, 13);
             this.lblChannelStatus.TabIndex = 3;
@@ -93,7 +98,7 @@
             // 
             this.cmbPort.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.cmbPort.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.cmbPort.Location = new System.Drawing.Point(12, 68);
+            this.cmbPort.Location = new System.Drawing.Point(62, 68);
             this.cmbPort.Name = "cmbPort";
             this.cmbPort.Size = new System.Drawing.Size(98, 21);
             this.cmbPort.TabIndex = 4;
@@ -104,17 +109,17 @@
             this.txtDisplay.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDisplay.Location = new System.Drawing.Point(12, 108);
+            this.txtDisplay.Location = new System.Drawing.Point(12, 131);
             this.txtDisplay.Multiline = true;
             this.txtDisplay.Name = "txtDisplay";
             this.txtDisplay.ReadOnly = true;
             this.txtDisplay.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtDisplay.Size = new System.Drawing.Size(359, 249);
+            this.txtDisplay.Size = new System.Drawing.Size(475, 321);
             this.txtDisplay.TabIndex = 5;
             // 
             // btnClearDisplay
             // 
-            this.btnClearDisplay.Location = new System.Drawing.Point(289, 79);
+            this.btnClearDisplay.Location = new System.Drawing.Point(405, 102);
             this.btnClearDisplay.Name = "btnClearDisplay";
             this.btnClearDisplay.Size = new System.Drawing.Size(82, 23);
             this.btnClearDisplay.TabIndex = 6;
@@ -122,11 +127,66 @@
             this.btnClearDisplay.UseVisualStyleBackColor = true;
             this.btnClearDisplay.Click += new System.EventHandler(this.btnClearDisplay_Click);
             // 
+            // btnScanMode
+            // 
+            this.btnScanMode.Location = new System.Drawing.Point(241, 12);
+            this.btnScanMode.Name = "btnScanMode";
+            this.btnScanMode.Size = new System.Drawing.Size(130, 23);
+            this.btnScanMode.TabIndex = 7;
+            this.btnScanMode.Text = "Open RX Scan Mode";
+            this.btnScanMode.UseVisualStyleBackColor = true;
+            this.btnScanMode.Click += new System.EventHandler(this.btnScanMode_Click);
+            // 
+            // cmbBaudRate
+            // 
+            this.cmbBaudRate.FormattingEnabled = true;
+            this.cmbBaudRate.Items.AddRange(new object[] {
+            "4800",
+            "57600"});
+            this.cmbBaudRate.Location = new System.Drawing.Point(246, 68);
+            this.cmbBaudRate.Name = "cmbBaudRate";
+            this.cmbBaudRate.Size = new System.Drawing.Size(105, 21);
+            this.cmbBaudRate.TabIndex = 8;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 71);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(53, 13);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "COM Port";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(182, 71);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(58, 13);
+            this.label2.TabIndex = 10;
+            this.label2.Text = "Baud Rate";
+            // 
+            // cbAscii
+            // 
+            this.cbAscii.AutoSize = true;
+            this.cbAscii.Location = new System.Drawing.Point(14, 108);
+            this.cbAscii.Name = "cbAscii";
+            this.cbAscii.Size = new System.Drawing.Size(90, 17);
+            this.cbAscii.TabIndex = 11;
+            this.cbAscii.Text = "ASCII Display";
+            this.cbAscii.UseVisualStyleBackColor = true;
+            this.cbAscii.CheckedChanged += new System.EventHandler(this.cbAscii_CheckedChanged);
+            // 
             // frmDisplay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(383, 369);
+            this.ClientSize = new System.Drawing.Size(499, 464);
+            this.Controls.Add(this.cbAscii);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.cmbBaudRate);
+            this.Controls.Add(this.btnScanMode);
             this.Controls.Add(this.btnClearDisplay);
             this.Controls.Add(this.txtDisplay);
             this.Controls.Add(this.cmbPort);
@@ -153,6 +213,11 @@
         private System.Windows.Forms.ComboBox cmbPort;
         private System.Windows.Forms.TextBox txtDisplay;
         private System.Windows.Forms.Button btnClearDisplay;
+        private System.Windows.Forms.Button btnScanMode;
+        private System.Windows.Forms.ComboBox cmbBaudRate;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox cbAscii;
     }
 }
 
