@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDisplay));
             this.serialPort = new System.IO.Ports.SerialPort();
             this.btnOpenCom = new System.Windows.Forms.Button();
             this.btnOpenChannel = new System.Windows.Forms.Button();
@@ -236,9 +237,11 @@
             this.Controls.Add(this.lblComStatus);
             this.Controls.Add(this.btnOpenChannel);
             this.Controls.Add(this.btnOpenCom);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmDisplay";
             this.Text = "ANT Data Reciever";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmDisplay_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmDisplay_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 

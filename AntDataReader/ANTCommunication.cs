@@ -17,7 +17,8 @@ namespace AntDataReader
         public delegate void ContinuationCallback();
         public ContinuationCallback callFunc;
         Dictionary<byte, string> responseCodes;
-        frmDisplay parent;
+        ANTDataInterpreter parent;
+        long startTime;
 
         public bool ResponseReceived
         {
@@ -35,7 +36,7 @@ namespace AntDataReader
             set { state = value; }
         }
 
-        public ANTCommunication(ref SerialPort spSet, frmDisplay parentForm)
+        public ANTCommunication(ref SerialPort spSet, ANTDataInterpreter parentForm)
         {
             sp = spSet;
             waitTimer = new System.Timers.Timer(500);
@@ -79,8 +80,8 @@ namespace AntDataReader
                 case 1:
                     callFunc = new ContinuationCallback(this.InitializeAntSyncronous);
                     SendCommand(ANTCommands.Reset());   //no response on AP1
-                    needsResponse = false;
-                    waitTimer.Start();
+                    needsResponse = true;
+                    //waitTimer.Start();
                     break;
                 case 2:
                     needsResponse = true;
@@ -93,12 +94,14 @@ namespace AntDataReader
                     SendCommand(ANTCommands.SetChannelPeriod());
                     break;
                 case 5:
+                    startTime = System.DateTime.Now.ToFileTimeUtc();
                     SendCommand(ANTCommands.OpenChannel());
                     break;
                 case 6:
+                    long stopTime = System.DateTime.Now.ToFileTimeUtc();
                     channelOpen = true;
                     callFunc = null;
-                    parent.statusCallback();
+                    parent.OnChannelOpened();
                     state = 0;
                     break;
             }
@@ -119,7 +122,7 @@ namespace AntDataReader
             {
                 channelOpen = true;
                 callFunc = null;
-                parent.statusCallback();
+                parent.OnChannelOpened();
                 state = 0;
             }
         }
@@ -145,7 +148,7 @@ namespace AntDataReader
             {
                 channelOpen = false;
                 callFunc = null;
-                parent.statusCallback();
+                parent.OnChannelClosed();
                 state = 0;
             }
         }
@@ -173,7 +176,7 @@ namespace AntDataReader
                 case 5:
                     channelOpen = true;
                     callFunc = null;
-                    parent.statusCallback();
+                    parent.OnChannelOpened();
                     state = 0;
                     break;
             }
@@ -182,6 +185,72 @@ namespace AntDataReader
         public void ResetANT()
         {
             SendCommand(ANTCommands.Reset());
+        }
+
+        /// <summary>
+        /// Decodes a Channel Response / Event (0x40)
+        /// </summary>
+        /// <param name="messageId">The message id from the response</param>
+        /// <param name="messageCode">The message code from the response</param>
+        /// <returns>A string containing the message to display</returns>
+        public string DecodeResponse(byte messageId, byte messageCode)
+        {
+            string displayMessage;
+            if (messageId == 1)
+            {
+                displayMessage = "RF event - Message Code: ";
+            }
+            else
+            {
+                displayMessage = "Message ID: " + messageId.ToString("X") + " - Message Code: ";
+            }
+            switch (messageCode)
+            {
+                case 0:
+                    displayMessage += "RESPONSE_NO_ERROR";
+                    break;
+                case 1:
+                    displayMessage += "EVENT_RX_SEARCH_TIMEOUT";
+                    parent.OnChannelClosed();
+
+                    /*
+                    //this event is raised in another thread, so we have to use invoke on a delegate
+                    object[] pass = new object[1];
+                    pass[0] = "Closed";
+                    this.Invoke(this.updateLabel, pass);
+                     */
+                    break;
+                case 2:
+                    displayMessage += "EVENT_RX_FAIL";
+                    break;
+                case 7:
+                    displayMessage += "EVENT_CHANNEL_CLOSED";
+                    break;
+                case 8:
+                    displayMessage += "EVENT_RX_FAIL_GO_TO_SEARCH";
+                    break;
+                default:
+                    displayMessage += "Message Code: " + messageCode.ToString();
+                    break;
+            }
+            return displayMessage;
+
+            //parent.DisplayMessage(displayMessage);
+
+            /*
+            RemoteDisplayUpdate(displayMessage);
+             */
+        }
+
+        public bool ChecksumVerify(byte[] toVerify)
+        {
+            byte checkSum = toVerify[0];
+            for (int i = 1; i < (toVerify.Length - 1); i++)
+            {
+                checkSum ^= toVerify[i];
+            }
+
+            return (checkSum == toVerify[toVerify.Length - 1]);
         }
     }
 }

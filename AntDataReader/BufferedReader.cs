@@ -14,7 +14,7 @@ namespace AntDataReader
         int cmpWrite;
         int messageStart;
         int messageLength;
-        frmDisplay parent;
+        ANTDataInterpreter parent;
         List<byte[]> messages;
         bool readingMessage;
 
@@ -31,7 +31,7 @@ namespace AntDataReader
             }
         }
 
-        public BufferedReader(frmDisplay parentForm)
+        public BufferedReader(ANTDataInterpreter parentForm)
         {
             buffer = new byte[maxIndex + 1];
             readIndex = 0;

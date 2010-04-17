@@ -15,7 +15,7 @@ namespace AntDataReader
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmDisplay());
+            Application.Run(new frmChoose());
         }
     }
 }

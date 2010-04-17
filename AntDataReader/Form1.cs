@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace AntDataReader
 {
-    public partial class frmDisplay : Form
+    public partial class frmDisplay : Form, ANTDataInterpreter
     {
         ANTCommunication antComm;
         public delegate void StatusCallback();
@@ -23,10 +23,13 @@ namespace AntDataReader
         int asciiMode = 0;
         bool debugMode = true;
         bool autoClear = false;
+        frmChoose chooserForm;
 
-        public frmDisplay()
+        public frmDisplay(frmChoose parent)
         {
             InitializeComponent();
+            chooserForm = parent;
+
             updateLabel = new UpdateLabel(this.UpdateLabelFunction);
             displayText = new DisplayText(this.UpdateDisplayTextFunction);
 
@@ -39,6 +42,7 @@ namespace AntDataReader
             serialPort.PortName = cmbPort.Text;
         }
 
+        /*
         private void CheckOpen()
         {
             if (antComm.ChannelOpen)
@@ -58,6 +62,7 @@ namespace AntDataReader
                 }
             }
         }
+         * */
 
 
         private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -66,53 +71,6 @@ namespace AntDataReader
             serialPort.Read(readData, 0, serialPort.BytesToRead);
             spBuffer.AddNewReceived(readData);
         }
-
-        /// <summary>
-        /// Decodes a Channel Response / Event (0x40)
-        /// </summary>
-        /// <param name="messageId">The message id from the response</param>
-        /// <param name="messageCode">The message code from the response</param>
-        private void DecodeResponse(byte messageId, byte messageCode)
-        {
-            string displayMessage;
-            if (messageId == 1)
-            {
-                displayMessage = "RF event - Message Code: ";
-            }
-            else
-            {
-                displayMessage = "Message ID: " + messageId.ToString("X") + " - Message Code: ";
-            }
-            switch (messageCode)
-            {
-                case 0:
-                    displayMessage += "RESPONSE_NO_ERROR";
-                    break;
-                case 1:
-                    displayMessage += "EVENT_RX_SEARCH_TIMEOUT";
-                    //this event is raised in another thread, so we have to use invoke on a delegate
-                    object[] pass = new object[1];
-                    pass[0] = "Closed";
-                    this.Invoke(this.updateLabel, pass);
-                    break;
-                case 2:
-                    displayMessage += "EVENT_RX_FAIL";
-                    break;
-                case 7:
-                    displayMessage += "EVENT_CHANNEL_CLOSED";
-                    break;
-                case 8:
-                    displayMessage += "EVENT_RX_FAIL_GO_TO_SEARCH";
-                    break;
-                default:
-                    displayMessage += "Message Code: " + messageCode.ToString();
-                    break;
-            }
-
-            RemoteDisplayUpdate(displayMessage);
-        }
-
-
 
         #region UI Delegates
 
@@ -205,7 +163,7 @@ namespace AntDataReader
                     {
                         antComm.InitState = 0;  //reset the initalization sequence to the beginning
                         antComm.InitializeAntSyncronous();
-                        statusCallback = new StatusCallback(this.CheckOpen);
+                        //statusCallback = new StatusCallback(this.CheckOpen);
                     }
                     else    //after first initialization, it only needs to be opened
                     {
@@ -237,6 +195,11 @@ namespace AntDataReader
             }
         }
 
+        private void frmDisplay_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            chooserForm.Close();
+        }
+
         private void btnScanMode_Click(object sender, EventArgs e)
         {
             if (antComm != null)
@@ -248,7 +211,7 @@ namespace AntDataReader
                 else
                 {   //open the channel
                     antComm.InitState = 0;  //reset the initalization sequence to the beginning
-                    statusCallback = new StatusCallback(this.CheckOpen);
+                    //statusCallback = new StatusCallback(this.CheckOpen);
                     antComm.RxScanMode();
                 }
             }
@@ -285,6 +248,7 @@ namespace AntDataReader
             if (antComm != null)
             {
                 antComm.ResetANT();
+                openedOnce = false;
             }
         }
 
@@ -308,13 +272,14 @@ namespace AntDataReader
 
         #endregion  //UI Event Handlers
 
+        #region ANTDataInterpreter Interface Members
+
         /// <summary>
         /// This function will be called remotely when the buffer has read a full message
         /// </summary>
         public void HaveMessages()
         {
             List<byte[]> readMessages = new List<byte[]>(spBuffer.Messages);
-            //byte[] readData = readMessages[0];
             foreach (byte[] readData in readMessages)
             {
 
@@ -331,12 +296,12 @@ namespace AntDataReader
                         }
                         if (debugMode)
                         {
-                            DecodeResponse(readData[4], readData[5]);
+                            RemoteDisplayUpdate(antComm.DecodeResponse(readData[4], readData[5]));
                         }
                     }
                     else if (debugMode)
                     {
-                        DecodeResponse(readData[4], readData[5]);
+                        RemoteDisplayUpdate(antComm.DecodeResponse(readData[4], readData[5]));
                     }
                 }
                 else if (readData[2] == 0x6F)
@@ -368,10 +333,11 @@ namespace AntDataReader
                                 fullText += "N0 ";
                             }
                         }
-                        else if (asciiMode == 1) {
+                        else if (asciiMode == 1)
+                        {
                             fullText += readData[i].ToString("D") + " ";
                         }
-                        else 
+                        else
                         {
                             fullText += readData[i].ToString("X") + " ";
                         }
@@ -385,9 +351,26 @@ namespace AntDataReader
             }
         }
 
+        public void OnChannelClosed()
+        {
+            object[] pass = new object[1];
+            pass[0] = "Closed";
+            this.Invoke(this.updateLabel, pass);
+        }
 
+        public void OnChannelOpened()
+        {
+            object[] pass = new object[1];
+            pass[0] = "Open";
+            this.Invoke(this.updateLabel, pass);
+            openedOnce = true;
+        }
 
+        public void DisplayMessage(string message)
+        {
+            RemoteDisplayUpdate(message);
+        }
 
-
+        #endregion
     }
 }
