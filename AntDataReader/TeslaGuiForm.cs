@@ -17,19 +17,63 @@ namespace AntDataReader
         private BufferedReader spBuffer;
         private bool channelOpen = false;
         bool debugMode = false;
+        System.Timers.Timer flashTimer;
+        delegate void UpdateGUI(DataDecoder.SensorType senseType, object[] parameters);
+        UpdateGUI updateGUI;
 
         public frmTeslaGui(frmChoose frmChoose)
         {
             InitializeComponent();
             this.chooserForm = frmChoose;
+            updateGUI = new UpdateGUI(this.UpdateGUIFunction);
+
+            //add the serial port selection to the menu
+            string[] serialPorts = System.IO.Ports.SerialPort.GetPortNames();
+            foreach (string portName in serialPorts)
+            {
+                COMPortToolStripMenuItem.DropDownItems.Add(portName, null, (object sender, EventArgs e) =>
+                {
+                    serialPort.PortName = portName;
+                    UncheckAllComs();
+                    ((ToolStripMenuItem)sender).Checked = true;
+                });
+                if (portName == "COM9")
+                {
+                    ((ToolStripMenuItem)COMPortToolStripMenuItem.DropDownItems[COMPortToolStripMenuItem.DropDownItems.Count - 1]).Checked = true;
+                }
+            }
 
             //set up serial port
-            serialPort.PortName = "COM9";
+            serialPort = new System.IO.Ports.SerialPort();
+            if (serialPorts.Contains("COM9"))
+            {
+                serialPort.PortName = "COM9";
+            }
             serialPort.BaudRate = 57600;
             serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(serialPort_DataReceived);
 
+            //Initialize classes
             antComm = new ANTCommunication(ref serialPort, this);
             spBuffer = new BufferedReader(this);
+
+            flashTimer = new System.Timers.Timer(50);
+            flashTimer.Elapsed += new System.Timers.ElapsedEventHandler(flashTimer_Elapsed);
+
+
+        }
+
+        void flashTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            flashTimer.Stop();
+            lblDataLED.BackColor = Color.White;
+        }
+
+        private void UncheckAllComs()
+        {
+            foreach (ToolStripMenuItem comItem in COMPortToolStripMenuItem.DropDownItems)
+            {
+                comItem.Checked = false;
+            }
         }
 
         void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -41,7 +85,21 @@ namespace AntDataReader
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+            try
+            {
+                serialPort.Open();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not open serial port: " + ex.Message);
+            }
+            if (serialPort.IsOpen)
+            {
+                antComm.RxScanMode();
+                startToolStripMenuItem.Enabled = false;
+                stopToolStripMenuItem.Enabled = true;
+                pauseToolStripMenuItem.Enabled = true;
+            }
         }
 
         #region ANTDataInterpreter Interface Members
@@ -65,12 +123,12 @@ namespace AntDataReader
                         }
                         if (debugMode)
                         {
-                            RemoteDisplayUpdate(antComm.DecodeResponse(readData[4], readData[5]));
+                            //RemoteDisplayUpdate(antComm.DecodeResponse(readData[4], readData[5]));
                         }
                     }
                     else if (debugMode)
                     {
-                        RemoteDisplayUpdate(antComm.DecodeResponse(readData[4], readData[5]));
+                        //RemoteDisplayUpdate(antComm.DecodeResponse(readData[4], readData[5]));
                     }
                 }
                 else if (readData[2] == 0x6F)
@@ -78,7 +136,7 @@ namespace AntDataReader
                     //startup message (AP2 only)
                     if (debugMode)
                     {
-                        RemoteDisplayUpdate("Startup message: " + readData[3].ToString("X"));
+                        //RemoteDisplayUpdate("Startup message: " + readData[3].ToString("X"));
                     }
                     if (antComm.callFunc != null)
                     {
@@ -91,20 +149,56 @@ namespace AntDataReader
                 }
                 else if (debugMode)
                 {
-                    RemoteDisplayUpdate("Message Id: " + readData[2].ToString("X"));
+                    //RemoteDisplayUpdate("Message Id: " + readData[2].ToString("X"));
                 }
             }
         }
 
         private void ProcessData(byte[] readData)
         {
-            int dataLength = readData[1];
+            if (antComm.ChecksumVerify(readData)) {
+                DataDecoder data = new DataDecoder(readData);
+                if (data.Sensor != DataDecoder.SensorType.InvalidData)
+                {
+                    object[] toPass;
+                    switch (data.Sensor)
+                    {
+                        case DataDecoder.SensorType.Temperature:
+                            double dataValue = Convert.ToDouble(data.ProcessedData[0].value) / 4095 * 2.5;
+                            toPass = new object[1];
+                            toPass[0] = dataValue;
+                            break;
+                        default:
+                            toPass = new object[1];
+                            break;
+                    }
+                    RemoteDisplayUpdate(toPass, data.Sensor);
+                }
+            }
 
         }
 
-        private void RemoteDisplayUpdate(string p)
+        private void RemoteDisplayUpdate(object[] passIn, DataDecoder.SensorType sensor)
         {
-            throw new NotImplementedException();
+            if (!this.IsDisposed)
+            {
+                object[] pass = new object[2];
+                pass[0] = sensor;
+                pass[1] = passIn;
+                this.Invoke(this.updateGUI, pass);
+            }
+        }
+
+        private void UpdateGUIFunction(DataDecoder.SensorType senseType, object[] parameters) {
+            switch (senseType)
+            {
+                case DataDecoder.SensorType.Temperature:
+                    lblTemp.Text = parameters[0].ToString();
+                    break;
+                default:
+                    MessageBox.Show("Unknown Sensor Type");
+                    break;
+            }
         }
 
         public void OnChannelClosed()
@@ -127,12 +221,26 @@ namespace AntDataReader
         private void FlashLED()
         {
             lblDataLED.BackColor = Color.LimeGreen;
-            tmrFlash.Start();
+
+            flashTimer.Start();
         }
 
-        private void tmrFlash_Tick(object sender, EventArgs e)
+        private void debugModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            lblDataLED.BackColor = Color.White;
+            debugMode = debugModeToolStripMenuItem.Checked;
+        }
+
+        private void frmTeslaGui_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            chooserForm.Close();
+        }
+
+        private void frmTeslaGui_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (antComm != null)
+            {
+                antComm.CloseChannel();
+            }
         }
     }
 }

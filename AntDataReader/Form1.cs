@@ -342,6 +342,10 @@ namespace AntDataReader
                             fullText += readData[i].ToString("X") + " ";
                         }
                     }
+                    if (!antComm.ChecksumVerify(readData))
+                    {
+                        fullText += "  !! Checksum Fail !!";
+                    }
                     RemoteDisplayUpdate(fullText);
                 }
                 else if (debugMode)
@@ -353,17 +357,23 @@ namespace AntDataReader
 
         public void OnChannelClosed()
         {
-            object[] pass = new object[1];
-            pass[0] = "Closed";
-            this.Invoke(this.updateLabel, pass);
+            if (!this.IsDisposed)
+            {
+                object[] pass = new object[1];
+                pass[0] = "Closed";
+                this.Invoke(this.updateLabel, pass);
+            }
         }
 
         public void OnChannelOpened()
         {
-            object[] pass = new object[1];
-            pass[0] = "Open";
-            this.Invoke(this.updateLabel, pass);
-            openedOnce = true;
+            if (!this.IsDisposed)
+            {
+                object[] pass = new object[1];
+                pass[0] = "Open";
+                this.Invoke(this.updateLabel, pass);
+                openedOnce = true;
+            }
         }
 
         public void DisplayMessage(string message)

@@ -211,7 +211,7 @@ namespace AntDataReader
                     break;
                 case 1:
                     displayMessage += "EVENT_RX_SEARCH_TIMEOUT";
-                    parent.OnChannelClosed();
+                    //parent.OnChannelClosed();
 
                     /*
                     //this event is raised in another thread, so we have to use invoke on a delegate
@@ -225,6 +225,7 @@ namespace AntDataReader
                     break;
                 case 7:
                     displayMessage += "EVENT_CHANNEL_CLOSED";
+                    parent.OnChannelClosed();
                     break;
                 case 8:
                     displayMessage += "EVENT_RX_FAIL_GO_TO_SEARCH";

@@ -38,7 +38,8 @@
             this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblDataLED = new System.Windows.Forms.Label();
-            this.tmrFlash = new System.Windows.Forms.Timer();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblTemp = new System.Windows.Forms.Label();
             this.mnuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,18 +72,18 @@
             // 
             // debugModeToolStripMenuItem
             // 
+            this.debugModeToolStripMenuItem.CheckOnClick = true;
             this.debugModeToolStripMenuItem.Name = "debugModeToolStripMenuItem";
             this.debugModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.debugModeToolStripMenuItem.Text = "Debug Mode";
+            this.debugModeToolStripMenuItem.Click += new System.EventHandler(this.debugModeToolStripMenuItem_Click);
             // 
             // dataCollectionToolStripMenuItem
             // 
-            this.dataCollectionToolStripMenuItem.CheckOnClick = true;
             this.dataCollectionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.startToolStripMenuItem,
             this.stopToolStripMenuItem,
             this.pauseToolStripMenuItem});
-            this.dataCollectionToolStripMenuItem.Enabled = false;
             this.dataCollectionToolStripMenuItem.Name = "dataCollectionToolStripMenuItem";
             this.dataCollectionToolStripMenuItem.Size = new System.Drawing.Size(100, 20);
             this.dataCollectionToolStripMenuItem.Text = "Data Collection";
@@ -103,6 +104,8 @@
             // 
             // pauseToolStripMenuItem
             // 
+            this.pauseToolStripMenuItem.CheckOnClick = true;
+            this.pauseToolStripMenuItem.Enabled = false;
             this.pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
             this.pauseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.pauseToolStripMenuItem.Text = "Pause";
@@ -116,9 +119,25 @@
             this.lblDataLED.Size = new System.Drawing.Size(20, 20);
             this.lblDataLED.TabIndex = 1;
             // 
-            // tmrFlash
+            // label1
             // 
-            this.tmrFlash.Tick += new System.EventHandler(this.tmrFlash_Tick);
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(12, 82);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(104, 20);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Temperature:";
+            // 
+            // lblTemp
+            // 
+            this.lblTemp.AutoSize = true;
+            this.lblTemp.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTemp.Location = new System.Drawing.Point(122, 82);
+            this.lblTemp.Name = "lblTemp";
+            this.lblTemp.Size = new System.Drawing.Size(31, 20);
+            this.lblTemp.TabIndex = 3;
+            this.lblTemp.Text = "XX";
             // 
             // frmTeslaGui
             // 
@@ -126,12 +145,16 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(696, 508);
+            this.Controls.Add(this.lblTemp);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.lblDataLED);
             this.Controls.Add(this.mnuMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.mnuMain;
             this.Name = "frmTeslaGui";
             this.Text = "Sensor Data";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmTeslaGui_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmTeslaGui_FormClosed);
             this.mnuMain.ResumeLayout(false);
             this.mnuMain.PerformLayout();
             this.ResumeLayout(false);
@@ -150,6 +173,7 @@
         private System.Windows.Forms.ToolStripMenuItem stopToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pauseToolStripMenuItem;
         private System.Windows.Forms.Label lblDataLED;
-        private System.Windows.Forms.Timer tmrFlash;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblTemp;
     }
 }

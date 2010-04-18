@@ -7,3 +7,5 @@ C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\Ant
 C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\bin\Debug\AntDataReader.pdb
 C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\AntDataReader.exe
 C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\AntDataReader.pdb
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\AntDataReader.frmChoose.resources
+C:\Users\Damian\Documents\School\ECEN 4610\TeamFolder\Software\AntDataReader\AntDataReader\obj\x86\Debug\AntDataReader.frmTeslaGui.resources
