@@ -133,7 +133,10 @@ namespace AntDataReader
         /// <param name="message">The message to send</param>
         private void SendCommand(byte[] message)
         {
-            sp.Write(message, 0, message.Length);
+            if (sp.IsOpen)
+            {
+                sp.Write(message, 0, message.Length);
+            }
         }
 
         public void CloseChannel()

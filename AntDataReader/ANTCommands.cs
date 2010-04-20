@@ -23,7 +23,13 @@ namespace AntDataReader
             data[1] = (byte)dataBytes;
             return data;
         }
-        static byte GetChecksum(byte[] dataCheck)
+
+        /// <summary>
+        /// Gets the checksum byte for a message
+        /// </summary>
+        /// <param name="dataCheck">The full message without the checksum</param>
+        /// <returns>The checksum byte</returns>
+        public static byte GetChecksum(byte[] dataCheck)
         {
             byte checkSum = dataCheck[0];
             for (int i = 1; i < dataCheck.Length; i++)

@@ -40,6 +40,8 @@
             this.lblDataLED = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.lblTemp = new System.Windows.Forms.Label();
+            this.lblTempGraph = new System.Windows.Forms.Label();
+            this.simulatedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -59,7 +61,8 @@
             this.optionsToolStripMenuItem.CheckOnClick = true;
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.COMPortToolStripMenuItem,
-            this.debugModeToolStripMenuItem});
+            this.debugModeToolStripMenuItem,
+            this.simulatedToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -101,6 +104,7 @@
             this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
             this.stopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.stopToolStripMenuItem.Text = "Stop";
+            this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
             // 
             // pauseToolStripMenuItem
             // 
@@ -123,7 +127,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 82);
+            this.label1.Location = new System.Drawing.Point(12, 36);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(104, 20);
             this.label1.TabIndex = 2;
@@ -133,11 +137,28 @@
             // 
             this.lblTemp.AutoSize = true;
             this.lblTemp.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTemp.Location = new System.Drawing.Point(122, 82);
+            this.lblTemp.Location = new System.Drawing.Point(122, 36);
             this.lblTemp.Name = "lblTemp";
             this.lblTemp.Size = new System.Drawing.Size(31, 20);
             this.lblTemp.TabIndex = 3;
             this.lblTemp.Text = "XX";
+            // 
+            // lblTempGraph
+            // 
+            this.lblTempGraph.BackColor = System.Drawing.Color.LightGray;
+            this.lblTempGraph.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.lblTempGraph.Location = new System.Drawing.Point(16, 69);
+            this.lblTempGraph.Name = "lblTempGraph";
+            this.lblTempGraph.Size = new System.Drawing.Size(200, 120);
+            this.lblTempGraph.TabIndex = 4;
+            // 
+            // simulatedToolStripMenuItem
+            // 
+            this.simulatedToolStripMenuItem.CheckOnClick = true;
+            this.simulatedToolStripMenuItem.Name = "simulatedToolStripMenuItem";
+            this.simulatedToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.simulatedToolStripMenuItem.Text = "Simulated";
+            this.simulatedToolStripMenuItem.Click += new System.EventHandler(this.simulatedToolStripMenuItem_Click);
             // 
             // frmTeslaGui
             // 
@@ -145,10 +166,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(696, 508);
+            this.Controls.Add(this.lblTempGraph);
             this.Controls.Add(this.lblTemp);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblDataLED);
             this.Controls.Add(this.mnuMain);
+            this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.mnuMain;
             this.Name = "frmTeslaGui";
@@ -175,5 +198,7 @@
         private System.Windows.Forms.Label lblDataLED;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lblTemp;
+        private System.Windows.Forms.Label lblTempGraph;
+        private System.Windows.Forms.ToolStripMenuItem simulatedToolStripMenuItem;
     }
 }

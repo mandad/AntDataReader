@@ -18,8 +18,12 @@ namespace AntDataReader
         private bool channelOpen = false;
         bool debugMode = false;
         System.Timers.Timer flashTimer;
+        System.Timers.Timer simTimer;
         delegate void UpdateGUI(DataDecoder.SensorType senseType, object[] parameters);
         UpdateGUI updateGUI;
+
+        Queue<double> pastTemps;
+        byte lastTemp = 0;
 
         public frmTeslaGui(frmChoose frmChoose)
         {
@@ -58,8 +62,39 @@ namespace AntDataReader
 
             flashTimer = new System.Timers.Timer(50);
             flashTimer.Elapsed += new System.Timers.ElapsedEventHandler(flashTimer_Elapsed);
+            simTimer = new System.Timers.Timer(100);
+            simTimer.Elapsed += new System.Timers.ElapsedEventHandler(simTimer_Elapsed);
 
+            pastTemps = new Queue<double>(100);
+        }
 
+        void simTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            //generate the temperature
+            int tempADC = Convert.ToInt32(Math.Round(((Convert.ToDouble(lastTemp++) / 100) + .5) * 4096 / 2.5));
+            byte LSB = Convert.ToByte(tempADC & 0xFF);
+            byte MSB = Convert.ToByte(((tempADC & 0xF00) >> 8) | 0x10);
+            if (lastTemp == 120)
+            {
+                lastTemp = 0;
+            }
+
+            byte[] readData = new byte[13];
+            readData[0] = 0xA4;
+            readData[1] = 9;
+            readData[2] = 0x4E;
+            readData[3] = 0;
+            readData[4] = MSB;  //start of data
+            readData[5] = LSB;
+            readData[6] = 0;
+            readData[7] = 0;
+            readData[8] = 0;
+            readData[9] = 0;
+            readData[10] = 0;
+            readData[11] = 0;
+            readData[12] = ANTCommands.GetChecksum(readData);
+
+            spBuffer.AddNewReceived(readData);
         }
 
         void flashTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -156,7 +191,8 @@ namespace AntDataReader
 
         private void ProcessData(byte[] readData)
         {
-            if (antComm.ChecksumVerify(readData)) {
+            if (antComm.ChecksumVerify(readData))
+            {
                 DataDecoder data = new DataDecoder(readData);
                 if (data.Sensor != DataDecoder.SensorType.InvalidData)
                 {
@@ -164,7 +200,16 @@ namespace AntDataReader
                     switch (data.Sensor)
                     {
                         case DataDecoder.SensorType.Temperature:
+                            //convert to voltage
                             double dataValue = Convert.ToDouble(data.ProcessedData[0].value) / 4095 * 2.5;
+                            //convert to temperature
+                            dataValue = (dataValue - .5) * 100;
+                            dataValue = Math.Round(dataValue, 2);
+                            pastTemps.Enqueue(dataValue);
+                            if (pastTemps.Count == 100)
+                            {
+                                pastTemps.Dequeue();
+                            }
                             toPass = new object[1];
                             toPass[0] = dataValue;
                             break;
@@ -189,11 +234,21 @@ namespace AntDataReader
             }
         }
 
-        private void UpdateGUIFunction(DataDecoder.SensorType senseType, object[] parameters) {
+        private void UpdateGUIFunction(DataDecoder.SensorType senseType, object[] parameters)
+        {
             switch (senseType)
             {
                 case DataDecoder.SensorType.Temperature:
                     lblTemp.Text = parameters[0].ToString();
+                    Graphics g = lblTempGraph.CreateGraphics();
+                    g.Clear(Color.LightGray);
+                    double[] graphPts = pastTemps.ToArray();
+                    Pen graphPen = new Pen(Color.Blue);
+                    for (int i = 0; i < graphPts.Length; i++)
+                    {
+                        g.DrawLine(graphPen, 2 * i, lblTempGraph.Height - Convert.ToInt32(Math.Round(graphPts[i], 0)),
+                            (2 * i) + 1, lblTempGraph.Height - Convert.ToInt32(Math.Round(graphPts[i])));
+                    }
                     break;
                 default:
                     MessageBox.Show("Unknown Sensor Type");
@@ -240,6 +295,23 @@ namespace AntDataReader
             if (antComm != null)
             {
                 antComm.CloseChannel();
+            }
+        }
+
+        private void stopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            antComm.CloseChannel();
+        }
+
+        private void simulatedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (simulatedToolStripMenuItem.Checked)
+            {
+                simTimer.Start();
+            }
+            else
+            {
+                simTimer.Stop();
             }
         }
     }
