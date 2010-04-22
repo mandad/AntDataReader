@@ -6,9 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
+using System.Net;
 
 namespace AntDataReader
 {
+    /// <summary>
+    /// The GUI form that displays received data
+    /// </summary>
     public partial class frmTeslaGui : Form, ANTDataInterpreter
     {
         private frmChoose chooserForm;
@@ -21,10 +26,18 @@ namespace AntDataReader
         System.Timers.Timer simTimer;
         delegate void UpdateGUI(DataDecoder.SensorType senseType, object[] parameters);
         UpdateGUI updateGUI;
+        System.IO.FileStream fsLog;
+        StreamWriter swLog;
+        int writeCount = 0;
 
         Queue<double> pastTemps;
         byte lastTemp = 0;
 
+        /// <summary>
+        /// Initialized the GUI
+        /// Attempts to open COM 9 by default
+        /// </summary>
+        /// <param name="frmChoose">The parent chooser form</param>
         public frmTeslaGui(frmChoose frmChoose)
         {
             InitializeComponent();
@@ -103,6 +116,9 @@ namespace AntDataReader
             lblDataLED.BackColor = Color.White;
         }
 
+        /// <summary>
+        /// Unchecks all the COM port selection menu items before selecting a new one
+        /// </summary>
         private void UncheckAllComs()
         {
             foreach (ToolStripMenuItem comItem in COMPortToolStripMenuItem.DropDownItems)
@@ -139,6 +155,9 @@ namespace AntDataReader
 
         #region ANTDataInterpreter Interface Members
 
+        /// <summary>
+        /// Called from BufferedReader when a full message has arrived
+        /// </summary>
         public void HaveMessages()
         {
             FlashLED();
@@ -189,6 +208,10 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Puts the data into a format for display
+        /// </summary>
+        /// <param name="readData">The full packet received from ANT</param>
         private void ProcessData(byte[] readData)
         {
             if (antComm.ChecksumVerify(readData))
@@ -201,7 +224,7 @@ namespace AntDataReader
                     {
                         case DataDecoder.SensorType.Temperature:
                             //convert to voltage
-                            double dataValue = Convert.ToDouble(data.ProcessedData[0].value) / 4095 * 2.5;
+                            double dataValue = GetADCVoltage(data.ProcessedData[0].value);
                             //convert to temperature
                             dataValue = (dataValue - .5) * 100;
                             dataValue = Math.Round(dataValue, 2);
@@ -217,10 +240,49 @@ namespace AntDataReader
                             toPass = new object[1];
                             break;
                     }
+                    WriteInfo(toPass, data.Sensor);
                     RemoteDisplayUpdate(toPass, data.Sensor);
                 }
             }
 
+        }
+
+        private static double GetADCVoltage(int ADCVal)
+        {
+            return Convert.ToDouble(ADCVal) / 4095 * 2.5;
+        }
+
+        /// <summary>
+        /// Writes data to a log file and the web
+        /// </summary>
+        /// <param name="toPass"></param>
+        /// <param name="sensorType"></param>
+        private void WriteInfo(object[] toPass, DataDecoder.SensorType sensorType)
+        {
+            writeCount++;
+
+            // write data to log
+            if (recordDataToolStripMenuItem.Checked)
+            {
+                switch (sensorType)
+                {
+                    case DataDecoder.SensorType.Temperature:
+                        if (fsLog != null)
+                        {
+                            swLog.WriteLine("Temp," + toPass[0].ToString());
+                        }
+
+                        //only write to the web every so often
+                        if ((writeCount > 10) && !thrdWebSubmit.IsBusy)
+                        {
+                            thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=temp&data[0]=" + toPass[0].ToString());
+                            writeCount = 0;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         private void RemoteDisplayUpdate(object[] passIn, DataDecoder.SensorType sensor)
@@ -234,12 +296,20 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Updates the GUI from another thread to avoid conflicts
+        /// </summary>
+        /// <param name="senseType">The type of the sensor data to update</param>
+        /// <param name="parameters">The data values required by that sensor</param>
         private void UpdateGUIFunction(DataDecoder.SensorType senseType, object[] parameters)
         {
             switch (senseType)
             {
                 case DataDecoder.SensorType.Temperature:
+                    //update label
                     lblTemp.Text = parameters[0].ToString();
+
+                    //draw grap
                     Graphics g = lblTempGraph.CreateGraphics();
                     g.Clear(Color.LightGray);
                     double[] graphPts = pastTemps.ToArray();
@@ -296,6 +366,11 @@ namespace AntDataReader
             {
                 antComm.CloseChannel();
             }
+            if (fsLog != null)
+            {
+                swLog.Close();
+                fsLog.Close();
+            }
         }
 
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
@@ -313,6 +388,41 @@ namespace AntDataReader
             {
                 simTimer.Stop();
             }
+        }
+
+        private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            dlgSaveFile.ShowDialog();
+        }
+
+        private void dlgSaveFile_FileOk(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                fsLog = new FileStream(dlgSaveFile.FileName, FileMode.Create);
+                swLog = new StreamWriter(fsLog);
+                //recordDataToolStripMenuItem.Enabled = true;
+                recordDataToolStripMenuItem.Checked = true;
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show("File error: " + ex.Message);
+                dlgSaveFile.ShowDialog();
+            }
+        }
+
+        private void recordDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!recordDataToolStripMenuItem.Checked)
+            {
+                //fsLog.Close();
+            }
+        }
+
+        private void thrdWebSubmit_DoWork(object sender, DoWorkEventArgs e)
+        {
+            HttpWebRequest request = WebRequest.Create(e.Argument.ToString()) as HttpWebRequest;
+            request.GetResponse();
         }
     }
 }

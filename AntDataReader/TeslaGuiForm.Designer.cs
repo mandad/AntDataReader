@@ -33,15 +33,20 @@
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.COMPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.simulatedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataCollectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.recordingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.recordDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblDataLED = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.lblTemp = new System.Windows.Forms.Label();
             this.lblTempGraph = new System.Windows.Forms.Label();
-            this.simulatedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
+            this.thrdWebSubmit = new System.ComponentModel.BackgroundWorker();
             this.mnuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,7 +54,8 @@
             // 
             this.mnuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.optionsToolStripMenuItem,
-            this.dataCollectionToolStripMenuItem});
+            this.dataCollectionToolStripMenuItem,
+            this.recordingToolStripMenuItem});
             this.mnuMain.Location = new System.Drawing.Point(0, 0);
             this.mnuMain.Name = "mnuMain";
             this.mnuMain.Size = new System.Drawing.Size(696, 24);
@@ -70,16 +76,24 @@
             // COMPortToolStripMenuItem
             // 
             this.COMPortToolStripMenuItem.Name = "COMPortToolStripMenuItem";
-            this.COMPortToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.COMPortToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.COMPortToolStripMenuItem.Text = "COM Port";
             // 
             // debugModeToolStripMenuItem
             // 
             this.debugModeToolStripMenuItem.CheckOnClick = true;
             this.debugModeToolStripMenuItem.Name = "debugModeToolStripMenuItem";
-            this.debugModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.debugModeToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.debugModeToolStripMenuItem.Text = "Debug Mode";
             this.debugModeToolStripMenuItem.Click += new System.EventHandler(this.debugModeToolStripMenuItem_Click);
+            // 
+            // simulatedToolStripMenuItem
+            // 
+            this.simulatedToolStripMenuItem.CheckOnClick = true;
+            this.simulatedToolStripMenuItem.Name = "simulatedToolStripMenuItem";
+            this.simulatedToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.simulatedToolStripMenuItem.Text = "Simulated";
+            this.simulatedToolStripMenuItem.Click += new System.EventHandler(this.simulatedToolStripMenuItem_Click);
             // 
             // dataCollectionToolStripMenuItem
             // 
@@ -94,7 +108,7 @@
             // startToolStripMenuItem
             // 
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
             this.startToolStripMenuItem.Text = "Start";
             this.startToolStripMenuItem.Click += new System.EventHandler(this.startToolStripMenuItem_Click);
             // 
@@ -102,7 +116,7 @@
             // 
             this.stopToolStripMenuItem.Enabled = false;
             this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-            this.stopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.stopToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
             this.stopToolStripMenuItem.Text = "Stop";
             this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
             // 
@@ -111,8 +125,32 @@
             this.pauseToolStripMenuItem.CheckOnClick = true;
             this.pauseToolStripMenuItem.Enabled = false;
             this.pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
-            this.pauseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.pauseToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
             this.pauseToolStripMenuItem.Text = "Pause";
+            // 
+            // recordingToolStripMenuItem
+            // 
+            this.recordingToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveToFileToolStripMenuItem,
+            this.recordDataToolStripMenuItem});
+            this.recordingToolStripMenuItem.Name = "recordingToolStripMenuItem";
+            this.recordingToolStripMenuItem.Size = new System.Drawing.Size(73, 20);
+            this.recordingToolStripMenuItem.Text = "Recording";
+            // 
+            // saveToFileToolStripMenuItem
+            // 
+            this.saveToFileToolStripMenuItem.Name = "saveToFileToolStripMenuItem";
+            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToFileToolStripMenuItem.Text = "Save to File";
+            this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveToFileToolStripMenuItem_Click);
+            // 
+            // recordDataToolStripMenuItem
+            // 
+            this.recordDataToolStripMenuItem.CheckOnClick = true;
+            this.recordDataToolStripMenuItem.Name = "recordDataToolStripMenuItem";
+            this.recordDataToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.recordDataToolStripMenuItem.Text = "Record Data";
+            this.recordDataToolStripMenuItem.Click += new System.EventHandler(this.recordDataToolStripMenuItem_Click);
             // 
             // lblDataLED
             // 
@@ -152,13 +190,15 @@
             this.lblTempGraph.Size = new System.Drawing.Size(200, 120);
             this.lblTempGraph.TabIndex = 4;
             // 
-            // simulatedToolStripMenuItem
+            // dlgSaveFile
             // 
-            this.simulatedToolStripMenuItem.CheckOnClick = true;
-            this.simulatedToolStripMenuItem.Name = "simulatedToolStripMenuItem";
-            this.simulatedToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.simulatedToolStripMenuItem.Text = "Simulated";
-            this.simulatedToolStripMenuItem.Click += new System.EventHandler(this.simulatedToolStripMenuItem_Click);
+            this.dlgSaveFile.Filter = "Log Files|*.tdl";
+            this.dlgSaveFile.RestoreDirectory = true;
+            this.dlgSaveFile.FileOk += new System.ComponentModel.CancelEventHandler(this.dlgSaveFile_FileOk);
+            // 
+            // thrdWebSubmit
+            // 
+            this.thrdWebSubmit.DoWork += new System.ComponentModel.DoWorkEventHandler(this.thrdWebSubmit_DoWork);
             // 
             // frmTeslaGui
             // 
@@ -200,5 +240,10 @@
         private System.Windows.Forms.Label lblTemp;
         private System.Windows.Forms.Label lblTempGraph;
         private System.Windows.Forms.ToolStripMenuItem simulatedToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem recordingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToFileToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog dlgSaveFile;
+        private System.Windows.Forms.ToolStripMenuItem recordDataToolStripMenuItem;
+        private System.ComponentModel.BackgroundWorker thrdWebSubmit;
     }
 }

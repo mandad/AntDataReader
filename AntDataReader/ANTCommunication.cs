@@ -20,22 +20,36 @@ namespace AntDataReader
         ANTDataInterpreter parent;
         long startTime;
 
+        /// <summary>
+        /// Set to indicate that a serial response has been received
+        /// </summary>
         public bool ResponseReceived
         {
             set { responseReceived = value; }
         }
 
+        /// <summary>
+        /// Indicates if the ANT channel is open
+        /// </summary>
         public bool ChannelOpen
         {
             get { return channelOpen; }
         }
 
+        /// <summary>
+        /// The state of a multistage function with multiple commands
+        /// </summary>
         public int InitState
         {
             get { return state; }
             set { state = value; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="spSet"></param>
+        /// <param name="parentForm"></param>
         public ANTCommunication(ref SerialPort spSet, ANTDataInterpreter parentForm)
         {
             sp = spSet;
@@ -70,7 +84,8 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Gets called repeatedly to sequence
+        /// Initialized sychronous ANT communication in receive mode
+        /// Default settings used
         /// </summary>
         public void InitializeAntSyncronous()
         {
@@ -94,11 +109,11 @@ namespace AntDataReader
                     SendCommand(ANTCommands.SetChannelPeriod());
                     break;
                 case 5:
-                    startTime = System.DateTime.Now.ToFileTimeUtc();
+                    //startTime = System.DateTime.Now.ToFileTimeUtc();
                     SendCommand(ANTCommands.OpenChannel());
                     break;
                 case 6:
-                    long stopTime = System.DateTime.Now.ToFileTimeUtc();
+                    //long stopTime = System.DateTime.Now.ToFileTimeUtc();
                     channelOpen = true;
                     callFunc = null;
                     parent.OnChannelOpened();
@@ -108,7 +123,7 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Reopens a channel that has been initialized
+        /// Reopens a channel that has been previously initialized
         /// </summary>
         public void OpenChannel()
         {
@@ -139,6 +154,9 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Closes the channel and waits for a response
+        /// </summary>
         public void CloseChannel()
         {
             state++;
@@ -156,6 +174,9 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Opens RX Scan mode without extended packets
+        /// </summary>
         public void RxScanMode()
         {
 
@@ -185,6 +206,9 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Sends the reset command, no response required
+        /// </summary>
         public void ResetANT()
         {
             SendCommand(ANTCommands.Reset());
@@ -246,6 +270,11 @@ namespace AntDataReader
              */
         }
 
+        /// <summary>
+        /// Runs through the elements of a data packet and checks its validity against the checksum byte
+        /// </summary>
+        /// <param name="toVerify">The data packet to verify</param>
+        /// <returns>True if the checksum is correct</returns>
         public bool ChecksumVerify(byte[] toVerify)
         {
             byte checkSum = toVerify[0];

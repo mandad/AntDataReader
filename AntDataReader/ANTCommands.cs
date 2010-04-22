@@ -59,6 +59,10 @@ namespace AntDataReader
             return data;
         }
 
+        /// <summary>
+        /// Sets the channel ID for a slave device, match any transmission, receive any
+        /// </summary>
+        /// <returns>The message packet</returns>
         public static byte[] SetChannelId()
         {
             byte[] message = BasicData(5);
@@ -73,6 +77,10 @@ namespace AntDataReader
             return message;
         }
 
+        /// <summary>
+        /// Performs a soft reset of the ANT system
+        /// </summary>
+        /// <returns>The message packet</returns>
         public static byte[] Reset()
         {
             byte[] message = BasicData(1);
@@ -83,6 +91,10 @@ namespace AntDataReader
             return message;
         }
 
+        /// <summary>
+        /// Opens the ANT channel after it has been initialized
+        /// </summary>
+        /// <returns>The message packet</returns>
         public static byte[] OpenChannel()
         {
             byte[] message = BasicData(1);
@@ -93,6 +105,10 @@ namespace AntDataReader
             return message;
         }
 
+        /// <summary>
+        /// Closes an open ANT channel
+        /// </summary>
+        /// <returns>The message packet</returns>
         public static byte[] CloseChannel()
         {
             byte[] message = BasicData(1);
@@ -103,6 +119,10 @@ namespace AntDataReader
             return message;
         }
 
+        /// <summary>
+        /// Opens scan mode after initialization of the channel
+        /// </summary>
+        /// <returns>The message packet</returns>
         public static byte[] OpenRxScanMode()
         {
             byte[] message = BasicData(1);
@@ -113,6 +133,10 @@ namespace AntDataReader
             return message;
         }
 
+        /// <summary>
+        /// Sets the channel message period
+        /// </summary>
+        /// <returns>The message packet</returns>
         public static byte[] SetChannelPeriod()
         {
             byte[] message = BasicData(3);

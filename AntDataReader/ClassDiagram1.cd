@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="AntDataReader.ANTCommands">
+    <Position X="2.25" Y="7" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAQCAEAAIABAAAAEAAAAAAABAAAAAAAAAAAAoAABA=</HashCode>
+      <FileName>ANTCommands.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.ANTCommunication">
+    <Position X="2.25" Y="0.5" Width="2" />
+    <NestedTypes>
+      <Delegate Name="AntDataReader.ANTCommunication.ContinuationCallback" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ANTCommunication.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAQgAGAAIAAAAABAQAIwAAACABAQQJAECAgIiAAAAAA=</HashCode>
+      <FileName>ANTCommunication.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.BufferedReader">
+    <Position X="4.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAABAAAAAAAIAQAQAQABBAQBQQQAAAAA=</HashCode>
+      <FileName>BufferedReader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.frmChoose">
+    <Position X="7" Y="3.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAACAAABAAAACAAAACAAQAAAAAAEAAAAEAAAA=</HashCode>
+      <FileName>ChooseForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.DataDecoder">
+    <Position X="4.75" Y="5" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="AntDataReader.DataDecoder.SensorType">
+        <TypeIdentifier>
+          <NewMemberFileName>DataDecoder.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="AntDataReader.DataDecoder.DataType">
+        <TypeIdentifier>
+          <NewMemberFileName>DataDecoder.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Class Name="AntDataReader.DataDecoder.DataItem">
+        <TypeIdentifier>
+          <NewMemberFileName>DataDecoder.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>EAABCAAAEQAAAAAAAEAAAABAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataDecoder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.frmDisplay" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="0.5" Width="3" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="AntDataReader.frmDisplay.StatusCallback" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Form1.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="AntDataReader.frmDisplay.UpdateLabel" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Form1.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="AntDataReader.frmDisplay.DisplayText" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Form1.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAUAAABEASEAUBUAADChIUWCiAxEHFIEogICkAICgCA=</HashCode>
+      <FileName>Form1.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="AntDataReader.Program" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.frmTeslaGui" BaseTypeListCollapsed="true">
+    <Position X="9.5" Y="0.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="AntDataReader.frmTeslaGui.UpdateGUI" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>TeslaGuiForm.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>EAQgAARABCAIEBQQxCiwIAiKIATEAIAEAkIZggAAgEA=</HashCode>
+      <FileName>TeslaGuiForm.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.143" />
+  </Class>
+  <Class Name="AntDataReader.Properties.Resources" Collapsed="true">
+    <Position X="0.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="AntDataReader.ANTDataInterpreter">
+    <Position X="7" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIACAAAAAAAAEAAIAAAAAAAA=</HashCode>
+      <FileName>ANTDataInterpreter.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

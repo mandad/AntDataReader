@@ -1,0 +1,312 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AntDataReader</name>
+    </assembly>
+    <members>
+        <member name="M:AntDataReader.Program.Main">
+            <summary>
+            The main entry point for the application.
+            </summary>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.BasicData(System.Int32)">
+            <summary>
+            Performs initial setup of the message packet
+            </summary>
+            <param name="dataBytes">Number of data bytes in the message</param>
+            <returns>The full packet prefilled with the sync and data length bytes</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.GetChecksum(System.Byte[])">
+            <summary>
+            Gets the checksum byte for a message
+            </summary>
+            <param name="dataCheck">The full message without the checksum</param>
+            <returns>The checksum byte</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.AssignChannel">
+            <summary>
+            Assigns the ANT Module to the default channel, bidirectional recieve mode
+            </summary>
+            <returns>The message content necessary to assign the channel</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.SetChannelId">
+            <summary>
+            Sets the channel ID for a slave device, match any transmission, receive any
+            </summary>
+            <returns>The message packet</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.Reset">
+            <summary>
+            Performs a soft reset of the ANT system
+            </summary>
+            <returns>The message packet</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.OpenChannel">
+            <summary>
+            Opens the ANT channel after it has been initialized
+            </summary>
+            <returns>The message packet</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.CloseChannel">
+            <summary>
+            Closes an open ANT channel
+            </summary>
+            <returns>The message packet</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.OpenRxScanMode">
+            <summary>
+            Opens scan mode after initialization of the channel
+            </summary>
+            <returns>The message packet</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommands.SetChannelPeriod">
+            <summary>
+            Sets the channel message period
+            </summary>
+            <returns>The message packet</returns>
+        </member>
+        <member name="T:AntDataReader.frmTeslaGui">
+            <summary>
+            The GUI form that displays received data
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.#ctor(AntDataReader.frmChoose)">
+            <summary>
+            Initialized the GUI
+            Attempts to open COM 9 by default
+            </summary>
+            <param name="frmChoose">The parent chooser form</param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.UncheckAllComs">
+            <summary>
+            Unchecks all the COM port selection menu items before selecting a new one
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.HaveMessages">
+            <summary>
+            Called from BufferedReader when a full message has arrived
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.ProcessData(System.Byte[])">
+            <summary>
+            Puts the data into a format for display
+            </summary>
+            <param name="readData">The full packet received from ANT</param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.WriteInfo(System.Object[],AntDataReader.DataDecoder.SensorType)">
+            <summary>
+            Writes data to a log file and the web
+            </summary>
+            <param name="toPass"></param>
+            <param name="sensorType"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.UpdateGUIFunction(AntDataReader.DataDecoder.SensorType,System.Object[])">
+            <summary>
+            Updates the GUI from another thread to avoid conflicts
+            </summary>
+            <param name="senseType">The type of the sensor data to update</param>
+            <param name="parameters">The data values required by that sensor</param>
+        </member>
+        <member name="F:AntDataReader.frmTeslaGui.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="P:AntDataReader.BufferedReader.Messages">
+            <summary>
+            The messages currently stored, destructive on read
+            </summary>
+        </member>
+        <member name="T:AntDataReader.frmDisplay">
+            <summary>
+            The debug display form
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.HaveMessages">
+            <summary>
+            This function will be called remotely when the buffer has read a full message
+            </summary>
+        </member>
+        <member name="F:AntDataReader.frmDisplay.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.#ctor(System.IO.Ports.SerialPort@,AntDataReader.ANTDataInterpreter)">
+            <summary>
+            
+            </summary>
+            <param name="spSet"></param>
+            <param name="parentForm"></param>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.GetResponseCodes">
+            <summary>
+            Fills a dictionary with keys of response message codes and values of their description
+            </summary>
+            <returns>the filled dictionary</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.InitializeAntSyncronous">
+            <summary>
+            Initialized sychronous ANT communication in receive mode
+            Default settings used
+            </summary>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.OpenChannel">
+            <summary>
+            Reopens a channel that has been previously initialized
+            </summary>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.SendCommand(System.Byte[])">
+            <summary>
+            Wites a command array to the serial port
+            </summary>
+            <param name="message">The message to send</param>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.CloseChannel">
+            <summary>
+            Closes the channel and waits for a response
+            </summary>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.RxScanMode">
+            <summary>
+            Opens RX Scan mode without extended packets
+            </summary>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.ResetANT">
+            <summary>
+            Sends the reset command, no response required
+            </summary>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.DecodeResponse(System.Byte,System.Byte)">
+            <summary>
+            Decodes a Channel Response / Event (0x40)
+            </summary>
+            <param name="messageId">The message id from the response</param>
+            <param name="messageCode">The message code from the response</param>
+            <returns>A string containing the message to display</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.ChecksumVerify(System.Byte[])">
+            <summary>
+            Runs through the elements of a data packet and checks its validity against the checksum byte
+            </summary>
+            <param name="toVerify">The data packet to verify</param>
+            <returns>True if the checksum is correct</returns>
+        </member>
+        <member name="P:AntDataReader.ANTCommunication.ResponseReceived">
+            <summary>
+            Set to indicate that a serial response has been received
+            </summary>
+        </member>
+        <member name="P:AntDataReader.ANTCommunication.ChannelOpen">
+            <summary>
+            Indicates if the ANT channel is open
+            </summary>
+        </member>
+        <member name="P:AntDataReader.ANTCommunication.InitState">
+            <summary>
+            The state of a multistage function with multiple commands
+            </summary>
+        </member>
+        <member name="F:AntDataReader.frmChoose.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmChoose.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:AntDataReader.frmChoose.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:AntDataReader.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:AntDataReader.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:AntDataReader.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="M:AntDataReader.DataDecoder.#ctor(System.Byte[])">
+            <summary>
+            Initialized the decoder class, will fill all elements if the format is properly recognised
+            </summary>
+            <param name="rawData">The raw ANT packet to process</param>
+        </member>
+        <member name="M:AntDataReader.DataDecoder.ProcessData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:AntDataReader.DataDecoder.GetAnalogNum(System.Byte,System.Byte)">
+            <summary>
+            Extracts a 12 bit analog value from two bytes, aligned to lower end
+            </summary>
+            <param name="MSB">The upper byte</param>
+            <param name="LSB">The lower byte</param>
+            <returns>The concatenated 12 bit number</returns>
+        </member>
+        <member name="P:AntDataReader.DataDecoder.ProcessedData">
+            <summary>
+            The data after it has been decoded
+            </summary>
+        </member>
+        <member name="P:AntDataReader.DataDecoder.Sensor">
+            <summary>
+            The type of sensor from which the data came
+            </summary>
+        </member>
+        <member name="T:AntDataReader.DataDecoder.SensorType">
+            <summary>
+            Represents the type of sensor
+            </summary>
+        </member>
+        <member name="T:AntDataReader.DataDecoder.DataType">
+            <summary>
+            Represents whether the data stored is analog or digital
+            </summary>
+        </member>
+        <member name="T:AntDataReader.DataDecoder.DataItem">
+            <summary>
+            Stores one piece of data from the sensor
+            </summary>
+        </member>
+    </members>
+</doc>

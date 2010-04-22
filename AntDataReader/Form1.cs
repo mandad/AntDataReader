@@ -9,6 +9,9 @@ using System.Windows.Forms;
 
 namespace AntDataReader
 {
+    /// <summary>
+    /// The debug display form
+    /// </summary>
     public partial class frmDisplay : Form, ANTDataInterpreter
     {
         ANTCommunication antComm;

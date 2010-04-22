@@ -12,16 +12,25 @@ namespace AntDataReader
         SensorType sensor = SensorType.InvalidData;
         DataItem[] processedData;
 
+        /// <summary>
+        /// The data after it has been decoded
+        /// </summary>
         public DataItem[] ProcessedData
         {
             get { return processedData; }
         }
 
+        /// <summary>
+        /// The type of sensor from which the data came
+        /// </summary>
         public SensorType Sensor
         {
             get { return sensor; }
         }
 
+        /// <summary>
+        /// Represents the type of sensor
+        /// </summary>
         public enum SensorType
         {
             Temperature,
@@ -31,12 +40,18 @@ namespace AntDataReader
             InvalidData
         }
 
+        /// <summary>
+        /// Represents whether the data stored is analog or digital
+        /// </summary>
         public enum DataType
         {
             Analog,
             Digital
         }
 
+        /// <summary>
+        /// Stores one piece of data from the sensor
+        /// </summary>
         public class DataItem
         {
             public DataItem(DataType thisType = DataType.Analog)
@@ -49,7 +64,10 @@ namespace AntDataReader
             public bool valid = false;
         }
 
-
+        /// <summary>
+        /// Initialized the decoder class, will fill all elements if the format is properly recognised
+        /// </summary>
+        /// <param name="rawData">The raw ANT packet to process</param>
         public DataDecoder(byte[] rawData)
         {
             rawPacket = rawData;
@@ -72,6 +90,9 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ProcessData()
         {
             switch (sensor)
@@ -88,6 +109,12 @@ namespace AntDataReader
 
         }
 
+        /// <summary>
+        /// Extracts a 12 bit analog value from two bytes, aligned to lower end
+        /// </summary>
+        /// <param name="MSB">The upper byte</param>
+        /// <param name="LSB">The lower byte</param>
+        /// <returns>The concatenated 12 bit number</returns>
         private int GetAnalogNum(byte MSB, byte LSB)
         {
             //mask off the 4 bits on top of MSB
