@@ -65,6 +65,12 @@
             </summary>
             <returns>The message packet</returns>
         </member>
+        <member name="M:AntDataReader.ANTCommands.RxExtMessageEnable">
+            <summary>
+            Gets the message to enable extended messages
+            </summary>
+            <returns>The message packet</returns>
+        </member>
         <member name="T:AntDataReader.frmTeslaGui">
             <summary>
             The GUI form that displays received data
@@ -93,19 +99,61 @@
             </summary>
             <param name="readData">The full packet received from ANT</param>
         </member>
-        <member name="M:AntDataReader.frmTeslaGui.WriteInfo(System.Object[],AntDataReader.DataDecoder.SensorType)">
+        <member name="M:AntDataReader.frmTeslaGui.GetADCVoltage(System.Int32)">
+            <summary>
+            Converts a 12bit number from the ADC to the actual voltage read
+            </summary>
+            <param name="ADCVal">The raw ADC value</param>
+            <returns></returns>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.WriteInfo(System.Object[],AntDataReader.DataDecoder.SensorType,System.Int32)">
             <summary>
             Writes data to a log file and the web
             </summary>
             <param name="toPass"></param>
             <param name="sensorType"></param>
         </member>
-        <member name="M:AntDataReader.frmTeslaGui.UpdateGUIFunction(AntDataReader.DataDecoder.SensorType,System.Object[])">
+        <member name="M:AntDataReader.frmTeslaGui.RemoteDisplayUpdate(System.Object[],AntDataReader.DataDecoder.SensorType,System.Int32)">
+            <summary>
+            Invokes the GUI update to make it thread safe
+            </summary>
+            <param name="passIn">The data needed to update the GUI for that sensor</param>
+            <param name="sensor">Sensor type of data to update</param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.UpdateGUIFunction(AntDataReader.DataDecoder.SensorType,System.Int32,System.Object[])">
             <summary>
             Updates the GUI from another thread to avoid conflicts
             </summary>
             <param name="senseType">The type of the sensor data to update</param>
             <param name="parameters">The data values required by that sensor</param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.OnChannelClosed">
+            <summary>
+            Called remotely when the ANT channel is closed
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.OnChannelOpened">
+            <summary>
+            Called remotely when the ANT channel is opened
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.DisplayMessage(System.String)">
+            <summary>
+            Called remotely to display a message
+            </summary>
+            <param name="message">The me</param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.FlashLED">
+            <summary>
+            Starts the sequence to flash the green square ("LED")
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.debugModeToolStripMenuItem_Click(System.Object,System.EventArgs)">
+            <summary>
+            Launches the Debug mode form
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
         </member>
         <member name="F:AntDataReader.frmTeslaGui.components">
             <summary>
@@ -272,7 +320,7 @@
         </member>
         <member name="M:AntDataReader.DataDecoder.ProcessData">
             <summary>
-            
+            Sets the data array for the type of sensor
             </summary>
         </member>
         <member name="M:AntDataReader.DataDecoder.GetAnalogNum(System.Byte,System.Byte)">
@@ -282,6 +330,24 @@
             <param name="MSB">The upper byte</param>
             <param name="LSB">The lower byte</param>
             <returns>The concatenated 12 bit number</returns>
+        </member>
+        <member name="M:AntDataReader.DataDecoder.GetDeviceID(System.Byte,System.Byte)">
+            <summary>
+            Concatenates the two bytes that make up the device ID
+            </summary>
+            <param name="MSB">The upper byte</param>
+            <param name="LSB">The lower byte (second in data transmission)</param>
+            <returns></returns>
+        </member>
+        <member name="P:AntDataReader.DataDecoder.DeviceID">
+            <summary>
+            Gives the device ID portion of the extended message
+            </summary>
+        </member>
+        <member name="P:AntDataReader.DataDecoder.IsExtendedMessage">
+            <summary>
+            Indicates if the message is an extended message
+            </summary>
         </member>
         <member name="P:AntDataReader.DataDecoder.ProcessedData">
             <summary>

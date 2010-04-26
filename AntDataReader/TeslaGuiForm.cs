@@ -24,7 +24,7 @@ namespace AntDataReader
         bool debugMode = false;
         System.Timers.Timer flashTimer;
         System.Timers.Timer simTimer;
-        delegate void UpdateGUI(DataDecoder.SensorType senseType, object[] parameters);
+        delegate void UpdateGUI(DataDecoder.SensorType senseType, int boardId, object[] parameters);
         UpdateGUI updateGUI;
         System.IO.FileStream fsLog;
         StreamWriter swLog;
@@ -79,6 +79,8 @@ namespace AntDataReader
             simTimer.Elapsed += new System.Timers.ElapsedEventHandler(simTimer_Elapsed);
 
             pastTemps = new Queue<double>(100);
+
+            lblError.Text = "";
         }
 
         void simTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -236,20 +238,35 @@ namespace AntDataReader
                             toPass = new object[1];
                             toPass[0] = dataValue;
                             break;
+                        case DataDecoder.SensorType.Accelerometer:
+                            double xValue = GetADCVoltage(data.ProcessedData[0].value);
+                            double yValue = GetADCVoltage(data.ProcessedData[1].value);
+                            double zValue = GetADCVoltage(data.ProcessedData[2].value);
+                            
+                            toPass = new object[3];
+                            toPass[0] = Math.Round(xValue,3);
+                            toPass[1] = Math.Round(yValue,3);
+                            toPass[2] = Math.Round(zValue,3);
+                            break;
                         default:
                             toPass = new object[1];
                             break;
                     }
-                    WriteInfo(toPass, data.Sensor);
-                    RemoteDisplayUpdate(toPass, data.Sensor);
+                    WriteInfo(toPass, data.Sensor, data.DeviceID);
+                    RemoteDisplayUpdate(toPass, data.Sensor, data.DeviceID);
                 }
             }
 
         }
 
+        /// <summary>
+        /// Converts a 12bit number from the ADC to the actual voltage read
+        /// </summary>
+        /// <param name="ADCVal">The raw ADC value</param>
+        /// <returns></returns>
         private static double GetADCVoltage(int ADCVal)
         {
-            return Convert.ToDouble(ADCVal) / 4095 * 2.5;
+            return Convert.ToDouble(ADCVal) / 4095 * 2.5;   //using a 2.5V reference
         }
 
         /// <summary>
@@ -257,7 +274,7 @@ namespace AntDataReader
         /// </summary>
         /// <param name="toPass"></param>
         /// <param name="sensorType"></param>
-        private void WriteInfo(object[] toPass, DataDecoder.SensorType sensorType)
+        private void WriteInfo(object[] toPass, DataDecoder.SensorType sensorType, int boardId)
         {
             writeCount++;
 
@@ -269,13 +286,31 @@ namespace AntDataReader
                     case DataDecoder.SensorType.Temperature:
                         if (fsLog != null)
                         {
-                            swLog.WriteLine("Temp," + toPass[0].ToString());
+                            //File format is [Sensor type],[Board ID],[Data1],[Data2],...
+                            swLog.WriteLine("Temp," + boardId.ToString() + "," + toPass[0].ToString());
                         }
 
                         //only write to the web every so often
-                        if ((writeCount > 10) && !thrdWebSubmit.IsBusy)
+                        if ((!simulatedToolStripMenuItem.Checked || (writeCount > 10)) && !thrdWebSubmit.IsBusy)
                         {
-                            thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=temp&data[0]=" + toPass[0].ToString());
+                            thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=temp&id=" + boardId.ToString()
+                                + "&data[0]=" + toPass[0].ToString());
+                            writeCount = 0;
+                        }
+                        break;
+                    case DataDecoder.SensorType.Accelerometer:
+                        if (fsLog != null)
+                        {
+                            //File format is [Sensor type],[Board ID],[Data1],[Data2],...
+                            swLog.WriteLine("Accel," + boardId.ToString() + "," + toPass[0].ToString() + "," + toPass[1].ToString() 
+                                + "," + toPass[2].ToString());
+                        }
+
+                        //only write to the web every so often
+                        if ((!simulatedToolStripMenuItem.Checked || (writeCount > 10)) && !thrdWebSubmit.IsBusy)
+                        {
+                            thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=accel&id=" + boardId.ToString()
+                                + "&data[0]=" + toPass[0].ToString() + "&data[1]=" + toPass[1].ToString() + "&data[2]=" + toPass[2].ToString());
                             writeCount = 0;
                         }
                         break;
@@ -285,13 +320,19 @@ namespace AntDataReader
             }
         }
 
-        private void RemoteDisplayUpdate(object[] passIn, DataDecoder.SensorType sensor)
+        /// <summary>
+        /// Invokes the GUI update to make it thread safe
+        /// </summary>
+        /// <param name="passIn">The data needed to update the GUI for that sensor</param>
+        /// <param name="sensor">Sensor type of data to update</param>
+        private void RemoteDisplayUpdate(object[] passIn, DataDecoder.SensorType sensor, int sensorBoard)
         {
             if (!this.IsDisposed)
             {
-                object[] pass = new object[2];
+                object[] pass = new object[3];
                 pass[0] = sensor;
-                pass[1] = passIn;
+                pass[1] = sensorBoard;
+                pass[2] = passIn;
                 this.Invoke(this.updateGUI, pass);
             }
         }
@@ -301,41 +342,57 @@ namespace AntDataReader
         /// </summary>
         /// <param name="senseType">The type of the sensor data to update</param>
         /// <param name="parameters">The data values required by that sensor</param>
-        private void UpdateGUIFunction(DataDecoder.SensorType senseType, object[] parameters)
+        private void UpdateGUIFunction(DataDecoder.SensorType senseType, int boardID, object[] parameters)
         {
+            lblError.Text = "";
             switch (senseType)
             {
                 case DataDecoder.SensorType.Temperature:
                     //update label
                     lblTemp.Text = parameters[0].ToString();
 
-                    //draw grap
+                    //draw graph
                     Graphics g = lblTempGraph.CreateGraphics();
                     g.Clear(Color.LightGray);
                     double[] graphPts = pastTemps.ToArray();
-                    Pen graphPen = new Pen(Color.Blue);
+                    Pen graphPen = new Pen(Color.Blue, 3);
                     for (int i = 0; i < graphPts.Length; i++)
                     {
-                        g.DrawLine(graphPen, 2 * i, lblTempGraph.Height - Convert.ToInt32(Math.Round(graphPts[i], 0)),
-                            (2 * i) + 1, lblTempGraph.Height - Convert.ToInt32(Math.Round(graphPts[i])));
+                        g.DrawLine(graphPen, 2 * i, lblTempGraph.Height - Convert.ToInt32(Math.Round(2 * graphPts[i], 0)),
+                            (2 * i) + 2, lblTempGraph.Height - Convert.ToInt32(Math.Round(2 * graphPts[i])));
                     }
                     break;
+                case DataDecoder.SensorType.Accelerometer:
+                    lblAccelX.Text = parameters[0].ToString();
+                    lblAccelY.Text = parameters[1].ToString();
+                    lblAccelZ.Text = parameters[2].ToString();
+                    break;
                 default:
-                    MessageBox.Show("Unknown Sensor Type");
+                    lblError.Text = "Unknown Sensor Type";
                     break;
             }
         }
 
+        /// <summary>
+        /// Called remotely when the ANT channel is closed
+        /// </summary>
         public void OnChannelClosed()
         {
             antComm.OpenChannel();
         }
 
+        /// <summary>
+        /// Called remotely when the ANT channel is opened
+        /// </summary>
         public void OnChannelOpened()
         {
             channelOpen = true;
         }
 
+        /// <summary>
+        /// Called remotely to display a message
+        /// </summary>
+        /// <param name="message">The me</param>
         public void DisplayMessage(string message)
         {
             throw new NotImplementedException();
@@ -343,6 +400,9 @@ namespace AntDataReader
 
         #endregion
 
+        /// <summary>
+        /// Starts the sequence to flash the green square ("LED")
+        /// </summary>
         private void FlashLED()
         {
             lblDataLED.BackColor = Color.LimeGreen;
@@ -350,9 +410,24 @@ namespace AntDataReader
             flashTimer.Start();
         }
 
+        /// <summary>
+        /// Launches the Debug mode form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void debugModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            debugMode = debugModeToolStripMenuItem.Checked;
+            if (antComm.ChannelOpen)
+            {
+                antComm.CloseChannel();
+            }
+            if (serialPort.IsOpen)
+            {
+                serialPort.Close();
+            }
+            Form launch = new frmDisplay(chooserForm);
+            launch.Show();
+            this.Hide();
         }
 
         private void frmTeslaGui_FormClosed(object sender, FormClosedEventArgs e)

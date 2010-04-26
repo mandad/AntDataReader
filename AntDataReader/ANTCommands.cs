@@ -149,6 +149,21 @@ namespace AntDataReader
             return message;
         }
 
+        /// <summary>
+        /// Gets the message to enable extended messages
+        /// </summary>
+        /// <returns>The message packet</returns>
+        public static byte[] RxExtMessageEnable()
+        {
+            byte[] message = BasicData(2);
+            message[2] = 0x66;
+            message[3] = 0; //filler
+            message[4] = 1; //enable
+            message[5] = GetChecksum(message);
+
+            return message;
+        }
+
         #endregion
         
     }

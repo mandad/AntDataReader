@@ -195,9 +195,12 @@ namespace AntDataReader
                     SendCommand(ANTCommands.SetChannelId());
                     break;
                 case 4:
-                    SendCommand(ANTCommands.OpenRxScanMode());
+                    SendCommand(ANTCommands.RxExtMessageEnable());
                     break;
                 case 5:
+                    SendCommand(ANTCommands.OpenRxScanMode());
+                    break;
+                case 6:
                     channelOpen = true;
                     callFunc = null;
                     parent.OnChannelOpened();

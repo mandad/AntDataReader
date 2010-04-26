@@ -11,6 +11,25 @@ namespace AntDataReader
         int dataLength;
         SensorType sensor = SensorType.InvalidData;
         DataItem[] processedData;
+        bool isExtendedMessage;
+        int deviceID;
+
+        /// <summary>
+        /// Gives the device ID portion of the extended message
+        /// </summary>
+        public int DeviceID
+        {
+            get { return deviceID; }
+            set { deviceID = value; }
+        }
+
+        /// <summary>
+        /// Indicates if the message is an extended message
+        /// </summary>
+        public bool IsExtendedMessage
+        {
+            get { return isExtendedMessage; }
+        }
 
         /// <summary>
         /// The data after it has been decoded
@@ -73,13 +92,28 @@ namespace AntDataReader
             rawPacket = rawData;
             dataLength = rawPacket[1];
             //if standard packet (first byte of data is the channel id)
-            if (dataLength == 9)
+            if (dataLength == 9 || dataLength == 14)
             {
-                int sensorType = rawData[4] & 0x70; //01110000 mask
-                sensorType = sensorType >> 4;
+                int sensorType = rawData[4] & 0xE0; //11100000 mask
+                sensorType = sensorType >> 5;
+
+                //set the extended message parameters
+                if ((dataLength == 14) && (rawData[12] == 0x80))
+                {
+                    isExtendedMessage = true;
+                    deviceID = GetDeviceID(rawData[13], rawData[14]);
+                }
+                else
+                {
+                    isExtendedMessage = false;
+                }
+
                 switch (sensorType)
                 {
-                    case 1:
+                    case 2:
+                        sensor = SensorType.Accelerometer;
+                        break;
+                    case 4:
                         sensor = SensorType.Temperature;
                         break;
                     default:
@@ -91,7 +125,7 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// 
+        /// Sets the data array for the type of sensor
         /// </summary>
         private void ProcessData()
         {
@@ -102,8 +136,18 @@ namespace AntDataReader
                     processedData[0] = new DataItem();
                     processedData[0].value = GetAnalogNum(rawPacket[4], rawPacket[5]);
                     processedData[0].valid = true;
-                    //analog1.value = GetAnalogNum(rawPacket[3], rawPacket[4]);
-                    //analog1.valid = true;
+                    break;
+                case SensorType.Accelerometer:
+                    processedData = new DataItem[3];
+                    processedData[0] = new DataItem();
+                    processedData[0].value = GetAnalogNum(rawPacket[4], rawPacket[5]);
+                    processedData[0].valid = true;
+                    processedData[1] = new DataItem();
+                    processedData[1].value = GetAnalogNum(rawPacket[6], rawPacket[7]);
+                    processedData[1].valid = true;
+                    processedData[2] = new DataItem();
+                    processedData[2].value = GetAnalogNum(rawPacket[7], rawPacket[8]);
+                    processedData[2].valid = true;
                     break;
             }
 
@@ -120,6 +164,21 @@ namespace AntDataReader
             //mask off the 4 bits on top of MSB
             MSB &= 0x0F;
 
+            //concatenate the two bytes
+            int construct = MSB;
+            construct = construct << 8;
+            construct |= LSB;
+            return construct;
+        }
+
+        /// <summary>
+        /// Concatenates the two bytes that make up the device ID
+        /// </summary>
+        /// <param name="MSB">The upper byte</param>
+        /// <param name="LSB">The lower byte (second in data transmission)</param>
+        /// <returns></returns>
+        private int GetDeviceID(byte MSB, byte LSB)
+        {
             //concatenate the two bytes
             int construct = MSB;
             construct = construct << 8;
