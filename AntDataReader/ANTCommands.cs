@@ -5,6 +5,9 @@ using System.Text;
 
 namespace AntDataReader
 {
+    /// <summary>
+    /// Stores commands for the ANT protocol
+    /// </summary>
     static class ANTCommands
     {
         const byte channelNum = 0x00;

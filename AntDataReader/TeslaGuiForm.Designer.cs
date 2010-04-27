@@ -56,6 +56,12 @@
             this.lblAccelZ = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.wpfHost = new System.Windows.Forms.Integration.ElementHost();
+            this.userControl11 = new AntDataReader.UserControl1();
+            this.tbTest = new System.Windows.Forms.TrackBar();
+            this.tbY = new System.Windows.Forms.TrackBar();
+            this.tbZ = new System.Windows.Forms.TrackBar();
+            this.lblLastMessage = new System.Windows.Forms.ToolStripStatusLabel();
             this.mnuMain.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -213,7 +219,8 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lblError});
+            this.lblError,
+            this.lblLastMessage});
             this.statusStrip1.Location = new System.Drawing.Point(0, 486);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(696, 22);
@@ -302,12 +309,58 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Accelerometer";
             // 
+            // wpfHost
+            // 
+            this.wpfHost.Location = new System.Drawing.Point(329, 102);
+            this.wpfHost.Name = "wpfHost";
+            this.wpfHost.Size = new System.Drawing.Size(315, 337);
+            this.wpfHost.TabIndex = 13;
+            this.wpfHost.Text = "elementHost1";
+            this.wpfHost.Child = this.userControl11;
+            // 
+            // tbTest
+            // 
+            this.tbTest.Location = new System.Drawing.Point(219, 312);
+            this.tbTest.Name = "tbTest";
+            this.tbTest.Size = new System.Drawing.Size(104, 45);
+            this.tbTest.TabIndex = 14;
+            this.tbTest.Scroll += new System.EventHandler(this.tbTest_Scroll);
+            // 
+            // tbY
+            // 
+            this.tbY.Location = new System.Drawing.Point(219, 363);
+            this.tbY.Name = "tbY";
+            this.tbY.Size = new System.Drawing.Size(104, 45);
+            this.tbY.TabIndex = 15;
+            this.tbY.Scroll += new System.EventHandler(this.tbY_Scroll);
+            // 
+            // tbZ
+            // 
+            this.tbZ.Location = new System.Drawing.Point(219, 414);
+            this.tbZ.Name = "tbZ";
+            this.tbZ.Size = new System.Drawing.Size(104, 45);
+            this.tbZ.TabIndex = 16;
+            this.tbZ.Scroll += new System.EventHandler(this.tbZ_Scroll);
+            // 
+            // lblLastMessage
+            // 
+            this.lblLastMessage.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.lblLastMessage.Name = "lblLastMessage";
+            this.lblLastMessage.Size = new System.Drawing.Size(558, 17);
+            this.lblLastMessage.Spring = true;
+            this.lblLastMessage.Text = "Last Message Time";
+            this.lblLastMessage.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // frmTeslaGui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(696, 508);
+            this.Controls.Add(this.tbZ);
+            this.Controls.Add(this.tbY);
+            this.Controls.Add(this.tbTest);
+            this.Controls.Add(this.wpfHost);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.lblTempGraph);
@@ -362,5 +415,11 @@
         private System.Windows.Forms.Label lblAccelZ;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Integration.ElementHost wpfHost;
+        private UserControl1 userControl11;
+        private System.Windows.Forms.TrackBar tbTest;
+        private System.Windows.Forms.TrackBar tbY;
+        private System.Windows.Forms.TrackBar tbZ;
+        private System.Windows.Forms.ToolStripStatusLabel lblLastMessage;
     }
 }

@@ -29,6 +29,7 @@ namespace AntDataReader
         System.IO.FileStream fsLog;
         StreamWriter swLog;
         int writeCount = 0;
+        TempVal tempConv;
 
         Queue<double> pastTemps;
         byte lastTemp = 0;
@@ -72,6 +73,7 @@ namespace AntDataReader
             //Initialize classes
             antComm = new ANTCommunication(ref serialPort, this);
             spBuffer = new BufferedReader(this);
+            tempConv = new TempVal();
 
             flashTimer = new System.Timers.Timer(50);
             flashTimer.Elapsed += new System.Timers.ElapsedEventHandler(flashTimer_Elapsed);
@@ -81,8 +83,16 @@ namespace AntDataReader
             pastTemps = new Queue<double>(100);
 
             lblError.Text = "";
+            lblLastMessage.Text = "";
+
+            //wpfHost.Refresh();
         }
 
+        /// <summary>
+        /// Creates a simulation packet for testing
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void simTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             //generate the temperature
@@ -112,6 +122,11 @@ namespace AntDataReader
             spBuffer.AddNewReceived(readData);
         }
 
+        /// <summary>
+        /// Resets the flash "LED" color back to normal
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void flashTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             flashTimer.Stop();
@@ -129,6 +144,11 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Processes data when it is received by the serial port
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             byte[] readData = new byte[serialPort.BytesToRead];
@@ -136,6 +156,11 @@ namespace AntDataReader
             spBuffer.AddNewReceived(readData);
         }
 
+        /// <summary>
+        /// Opens the serial port and ANT protocol when the "Start" menu item is clicked 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -228,7 +253,8 @@ namespace AntDataReader
                             //convert to voltage
                             double dataValue = GetADCVoltage(data.ProcessedData[0].value);
                             //convert to temperature
-                            dataValue = (dataValue - .5) * 100;
+                            //dataValue = (dataValue - .5) * 100;   //TMP 36
+                            dataValue = tempConv.GetTemp(dataValue);
                             dataValue = Math.Round(dataValue, 2);
                             pastTemps.Enqueue(dataValue);
                             if (pastTemps.Count == 100)
@@ -239,9 +265,9 @@ namespace AntDataReader
                             toPass[0] = dataValue;
                             break;
                         case DataDecoder.SensorType.Accelerometer:
-                            double xValue = GetADCVoltage(data.ProcessedData[0].value);
-                            double yValue = GetADCVoltage(data.ProcessedData[1].value);
-                            double zValue = GetADCVoltage(data.ProcessedData[2].value);
+                            double xValue = data.ProcessedData[0].value;
+                            double yValue = data.ProcessedData[1].value;
+                            double zValue = data.ProcessedData[2].value;
                             
                             toPass = new object[3];
                             toPass[0] = Math.Round(xValue,3);
@@ -266,14 +292,15 @@ namespace AntDataReader
         /// <returns></returns>
         private static double GetADCVoltage(int ADCVal)
         {
-            return Convert.ToDouble(ADCVal) / 4095 * 2.5;   //using a 2.5V reference
+            return Convert.ToDouble(ADCVal) / 4095 * 1.5;   //using a 1.5V reference
         }
 
         /// <summary>
         /// Writes data to a log file and the web
         /// </summary>
-        /// <param name="toPass"></param>
-        /// <param name="sensorType"></param>
+        /// <param name="toPass">The data from the sensor</param>
+        /// <param name="sensorType">The type of sensor from which the data was taken</param>
+        /// <param name="boardId">The ID of the board</param>
         private void WriteInfo(object[] toPass, DataDecoder.SensorType sensorType, int boardId)
         {
             writeCount++;
@@ -325,6 +352,7 @@ namespace AntDataReader
         /// </summary>
         /// <param name="passIn">The data needed to update the GUI for that sensor</param>
         /// <param name="sensor">Sensor type of data to update</param>
+        /// <param name="sensorBoard">The ID of the sensor board transmitting the data</param>
         private void RemoteDisplayUpdate(object[] passIn, DataDecoder.SensorType sensor, int sensorBoard)
         {
             if (!this.IsDisposed)
@@ -341,10 +369,12 @@ namespace AntDataReader
         /// Updates the GUI from another thread to avoid conflicts
         /// </summary>
         /// <param name="senseType">The type of the sensor data to update</param>
+        /// <param name="boardID">The board from which the data originated</param>
         /// <param name="parameters">The data values required by that sensor</param>
         private void UpdateGUIFunction(DataDecoder.SensorType senseType, int boardID, object[] parameters)
         {
             lblError.Text = "";
+            lblLastMessage.Text = DateTime.Now.ToLongTimeString();
             switch (senseType)
             {
                 case DataDecoder.SensorType.Temperature:
@@ -363,9 +393,13 @@ namespace AntDataReader
                     }
                     break;
                 case DataDecoder.SensorType.Accelerometer:
+                    double accelX = (Convert.ToDouble(parameters[0])-2047.5) / 2047.5 * 2;
+                    double accelY = (Convert.ToDouble(parameters[1])-2047.5) / 2047.5 * 2;
+                    double accelZ = (Convert.ToDouble(parameters[2])-2047.5) / 2047.5 * 2;
                     lblAccelX.Text = parameters[0].ToString();
                     lblAccelY.Text = parameters[1].ToString();
                     lblAccelZ.Text = parameters[2].ToString();
+                    userControl11.UpdateDisplay(accelX, accelY, accelZ);
                     break;
                 default:
                     lblError.Text = "Unknown Sensor Type";
@@ -430,11 +464,22 @@ namespace AntDataReader
             this.Hide();
         }
 
+        /// <summary>
+        /// Closes the hidden chooser form when this one is closed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void frmTeslaGui_FormClosed(object sender, FormClosedEventArgs e)
         {
             chooserForm.Close();
         }
 
+        /// <summary>
+        /// Close the ant channel and serial port when the form closes
+        /// Stop logging data if necessary
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void frmTeslaGui_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (antComm != null)
@@ -447,6 +492,7 @@ namespace AntDataReader
                 fsLog.Close();
             }
         }
+
 
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -470,6 +516,11 @@ namespace AntDataReader
             dlgSaveFile.ShowDialog();
         }
 
+        /// <summary>
+        /// Handles saving the file for the log
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dlgSaveFile_FileOk(object sender, CancelEventArgs e)
         {
             try
@@ -494,10 +545,36 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Runs the web data submission in a background thread
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void thrdWebSubmit_DoWork(object sender, DoWorkEventArgs e)
         {
             HttpWebRequest request = WebRequest.Create(e.Argument.ToString()) as HttpWebRequest;
-            request.GetResponse();
+            try
+            {
+                request.GetResponse();
+            }
+            catch
+            {
+            }
+        }
+
+        private void tbTest_Scroll(object sender, EventArgs e)
+        {
+            userControl11.RotateX(Convert.ToDouble(tbTest.Value) / Convert.ToDouble(tbTest.Maximum) * 360); 
+        }
+
+        private void tbY_Scroll(object sender, EventArgs e)
+        {
+            userControl11.RotateY(Convert.ToDouble(tbY.Value) / Convert.ToDouble(tbY.Maximum) * 360);
+        }
+
+        private void tbZ_Scroll(object sender, EventArgs e)
+        {
+            userControl11.RotateZ(Convert.ToDouble(tbZ.Value) / Convert.ToDouble(tbZ.Maximum) * 360);
         }
     }
 }

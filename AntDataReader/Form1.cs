@@ -45,29 +45,6 @@ namespace AntDataReader
             serialPort.PortName = cmbPort.Text;
         }
 
-        /*
-        private void CheckOpen()
-        {
-            if (antComm.ChannelOpen)
-            {
-                object[] pass = new object[1];
-                pass[0] = "Open";
-                this.Invoke(this.updateLabel, pass);
-                openedOnce = true;
-            }
-            else
-            {
-                if (!this.IsDisposed)
-                {
-                    object[] pass = new object[1];
-                    pass[0] = "Closed";
-                    this.Invoke(this.updateLabel, pass);
-                }
-            }
-        }
-         * */
-
-
         private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             byte[] readData = new byte[serialPort.BytesToRead];

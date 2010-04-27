@@ -5,6 +5,9 @@ using System.Text;
 
 namespace AntDataReader
 {
+    /// <summary>
+    /// Decodes a data packet from the ANT protocol to extract sensor information
+    /// </summary>
     class DataDecoder
     {
         byte[] rawPacket;

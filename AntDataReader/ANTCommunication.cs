@@ -6,6 +6,9 @@ using System.IO.Ports;
 
 namespace AntDataReader
 {
+    /// <summary>
+    /// Handles ANT communication protocol and interaction with the Nordic chip
+    /// </summary>
     class ANTCommunication
     {
         SerialPort sp;
@@ -46,10 +49,10 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// 
+        /// Initiates the communication class
         /// </summary>
-        /// <param name="spSet"></param>
-        /// <param name="parentForm"></param>
+        /// <param name="spSet">The serial port used for communication to the USB receiver</param>
+        /// <param name="parentForm">The form using this</param>
         public ANTCommunication(ref SerialPort spSet, ANTDataInterpreter parentForm)
         {
             sp = spSet;

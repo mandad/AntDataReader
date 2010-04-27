@@ -5,6 +5,10 @@ using System.Text;
 
 namespace AntDataReader
 {
+    /// <summary>
+    /// Manages the read buffer for ANT serial data
+    /// Calls a function when a full data packet is received
+    /// </summary>
     class BufferedReader
     {
         const int maxIndex = 10000;
@@ -31,6 +35,10 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Initializes the buffer
+        /// </summary>
+        /// <param name="parentForm">The form to report information back to</param>
         public BufferedReader(ANTDataInterpreter parentForm)
         {
             buffer = new byte[maxIndex + 1];
@@ -42,6 +50,10 @@ namespace AntDataReader
             parent = parentForm;
         }
 
+        /// <summary>
+        /// Adds new serial port data to the buffer
+        /// </summary>
+        /// <param name="data">The raw serial data array</param>
         public void AddNewReceived(byte[] data)
         {
             if ((writeIndex + data.Length) <= maxIndex)
@@ -66,11 +78,14 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Checkes if there is a full ANT Data message to read in the buffer
+        /// </summary>
         private void CheckForMessage()
         {
             if (readingMessage)
             {
-                //check if got lenght yet, if we are checking again we have more data and thus the length
+                //check if got length yet, if we are checking again we have more data and thus the length
                 if (messageLength == 0)
                 {
                     if (messageStart == maxIndex)

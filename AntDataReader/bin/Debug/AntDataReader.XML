@@ -4,9 +4,54 @@
         <name>AntDataReader</name>
     </assembly>
     <members>
+        <member name="T:AntDataReader.CubeBuilder">
+            <summary>
+            Builds a 3D WPF rectangle
+            </summary>
+        </member>
+        <member name="M:AntDataReader.CubeBuilder.#ctor(System.Windows.Media.Color)">
+            <summary>
+            Sets the color of the cube
+            </summary>
+            <param name="color">The color to set</param>
+        </member>
+        <member name="M:AntDataReader.CubeBuilder.Create(AntDataReader.CubeBuilder.Direction,System.Double)">
+            <summary>
+            Creates the cube
+            </summary>
+            <returns>The cube object</returns>
+        </member>
+        <member name="M:AntDataReader.CubeBuilder.CreateTriangle(System.Windows.Media.Media3D.Point3D,System.Windows.Media.Media3D.Point3D,System.Windows.Media.Media3D.Point3D)">
+            <summary>
+            Creates triangles given corner points
+            </summary>
+            <param name="p0">The first point</param>
+            <param name="p1">The second point</param>
+            <param name="p2">The third point</param>
+            <returns>The triangle as a model</returns>
+        </member>
+        <member name="T:AntDataReader.VectorHelper">
+            <summary>
+            Contains vector manipulation functions
+            </summary>
+        </member>
+        <member name="M:AntDataReader.VectorHelper.CalcNormal(System.Windows.Media.Media3D.Point3D,System.Windows.Media.Media3D.Point3D,System.Windows.Media.Media3D.Point3D)">
+            <summary>
+            Calculates the normal vector to a point
+            </summary>
+            <param name="p0">The first point</param>
+            <param name="p1">The second point</param>
+            <param name="p2">The third point</param>
+            <returns>The normal vector</returns>
+        </member>
         <member name="M:AntDataReader.Program.Main">
             <summary>
             The main entry point for the application.
+            </summary>
+        </member>
+        <member name="T:AntDataReader.ANTCommands">
+            <summary>
+            Stores commands for the ANT protocol
             </summary>
         </member>
         <member name="M:AntDataReader.ANTCommands.BasicData(System.Int32)">
@@ -83,10 +128,38 @@
             </summary>
             <param name="frmChoose">The parent chooser form</param>
         </member>
+        <member name="M:AntDataReader.frmTeslaGui.simTimer_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+            Creates a simulation packet for testing
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.flashTimer_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+            Resets the flash "LED" color back to normal
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
         <member name="M:AntDataReader.frmTeslaGui.UncheckAllComs">
             <summary>
             Unchecks all the COM port selection menu items before selecting a new one
             </summary>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.serialPort_DataReceived(System.Object,System.IO.Ports.SerialDataReceivedEventArgs)">
+            <summary>
+            Processes data when it is received by the serial port
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.startToolStripMenuItem_Click(System.Object,System.EventArgs)">
+            <summary>
+            Opens the serial port and ANT protocol when the "Start" menu item is clicked 
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.HaveMessages">
             <summary>
@@ -110,8 +183,9 @@
             <summary>
             Writes data to a log file and the web
             </summary>
-            <param name="toPass"></param>
-            <param name="sensorType"></param>
+            <param name="toPass">The data from the sensor</param>
+            <param name="sensorType">The type of sensor from which the data was taken</param>
+            <param name="boardId">The ID of the board</param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.RemoteDisplayUpdate(System.Object[],AntDataReader.DataDecoder.SensorType,System.Int32)">
             <summary>
@@ -119,12 +193,14 @@
             </summary>
             <param name="passIn">The data needed to update the GUI for that sensor</param>
             <param name="sensor">Sensor type of data to update</param>
+            <param name="sensorBoard">The ID of the sensor board transmitting the data</param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.UpdateGUIFunction(AntDataReader.DataDecoder.SensorType,System.Int32,System.Object[])">
             <summary>
             Updates the GUI from another thread to avoid conflicts
             </summary>
             <param name="senseType">The type of the sensor data to update</param>
+            <param name="boardID">The board from which the data originated</param>
             <param name="parameters">The data values required by that sensor</param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.OnChannelClosed">
@@ -155,6 +231,35 @@
             <param name="sender"></param>
             <param name="e"></param>
         </member>
+        <member name="M:AntDataReader.frmTeslaGui.frmTeslaGui_FormClosed(System.Object,System.Windows.Forms.FormClosedEventArgs)">
+            <summary>
+            Closes the hidden chooser form when this one is closed
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.frmTeslaGui_FormClosing(System.Object,System.Windows.Forms.FormClosingEventArgs)">
+            <summary>
+            Close the ant channel and serial port when the form closes
+            Stop logging data if necessary
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.dlgSaveFile_FileOk(System.Object,System.ComponentModel.CancelEventArgs)">
+            <summary>
+            Handles saving the file for the log
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.thrdWebSubmit_DoWork(System.Object,System.ComponentModel.DoWorkEventArgs)">
+            <summary>
+            Runs the web data submission in a background thread
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
         <member name="F:AntDataReader.frmTeslaGui.components">
             <summary>
             Required designer variable.
@@ -170,6 +275,29 @@
             <summary>
             Required method for Designer support - do not modify
             the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:AntDataReader.BufferedReader">
+            <summary>
+            Manages the read buffer for ANT serial data
+            Calls a function when a full data packet is received
+            </summary>
+        </member>
+        <member name="M:AntDataReader.BufferedReader.#ctor(AntDataReader.ANTDataInterpreter)">
+            <summary>
+            Initializes the buffer
+            </summary>
+            <param name="parentForm">The form to report information back to</param>
+        </member>
+        <member name="M:AntDataReader.BufferedReader.AddNewReceived(System.Byte[])">
+            <summary>
+            Adds new serial port data to the buffer
+            </summary>
+            <param name="data">The raw serial data array</param>
+        </member>
+        <member name="M:AntDataReader.BufferedReader.CheckForMessage">
+            <summary>
+            Checkes if there is a full ANT Data message to read in the buffer
             </summary>
         </member>
         <member name="P:AntDataReader.BufferedReader.Messages">
@@ -204,12 +332,47 @@
             the contents of this method with the code editor.
             </summary>
         </member>
+        <member name="T:AntDataReader.TempVal">
+            <summary>
+            Used to correlated ADC voltages to LM94022 temperatures
+            </summary>
+        </member>
+        <member name="M:AntDataReader.TempVal.#ctor">
+            <summary>
+            Initializes the correlation array
+            </summary>
+        </member>
+        <member name="M:AntDataReader.TempVal.GetTemp(System.Double)">
+            <summary>
+            Returns a temperature given an ADC voltage
+            </summary>
+            <param name="voltage">The voltage read by the ADC</param>
+            <returns>Temperature in degrees C</returns>
+        </member>
+        <member name="M:AntDataReader.TempVal.SearchTemp(System.Double,System.Int32)">
+            <summary>
+            Searches for a temperature near a given voltage
+            </summary>
+            <param name="searchVal">The voltage to search near</param>
+            <param name="direction">Direction to search (+/-1)</param>
+            <returns>The nearest voltage that has a corresponding temp</returns>
+        </member>
+        <member name="M:AntDataReader.TempVal.FillTransferTable">
+            <summary>
+            Fills the correlation array with factors from the datasheet
+            </summary>
+        </member>
+        <member name="T:AntDataReader.ANTCommunication">
+            <summary>
+            Handles ANT communication protocol and interaction with the Nordic chip
+            </summary>
+        </member>
         <member name="M:AntDataReader.ANTCommunication.#ctor(System.IO.Ports.SerialPort@,AntDataReader.ANTDataInterpreter)">
             <summary>
-            
+            Initiates the communication class
             </summary>
-            <param name="spSet"></param>
-            <param name="parentForm"></param>
+            <param name="spSet">The serial port used for communication to the USB receiver</param>
+            <param name="parentForm">The form using this</param>
         </member>
         <member name="M:AntDataReader.ANTCommunication.GetResponseCodes">
             <summary>
@@ -310,6 +473,24 @@
             <summary>
               Overrides the current thread's CurrentUICulture property for all
               resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:AntDataReader.UserControl1">
+            <summary>
+            Interaction logic for UserControl1.xaml
+            </summary>
+            <summary>
+            UserControl1
+            </summary>
+        </member>
+        <member name="M:AntDataReader.UserControl1.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:AntDataReader.DataDecoder">
+            <summary>
+            Decodes a data packet from the ANT protocol to extract sensor information
             </summary>
         </member>
         <member name="M:AntDataReader.DataDecoder.#ctor(System.Byte[])">
