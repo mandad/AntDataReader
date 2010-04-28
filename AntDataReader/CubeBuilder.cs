@@ -14,6 +14,9 @@ namespace AntDataReader
     {
         private Color _color;
 
+        /// <summary>
+        /// The color of the rectangle
+        /// </summary>
         public Color CubeColor
         {
             get { return _color; }
@@ -29,6 +32,9 @@ namespace AntDataReader
             _color = color;
         }
 
+        /// <summary>
+        /// Represents a direction to draw the rod
+        /// </summary>
         public enum Direction {
             X,
             Y,
@@ -55,19 +61,19 @@ namespace AntDataReader
                     yVal = 2;
                     zVal = 2;
                     break;
-                case Direction.Y:
+                case Direction.Z:
                     xVal = 2;
                     yVal = length;
                     zVal = 2;
                     break;
-                case Direction.Z:
+                case Direction.Y:
                     xVal = 2;
                     yVal = 2;
                     zVal = length;
                     break;
             }
 
-
+            //create the rectangular prism side points
             Point3D p0 = new Point3D(0, 0, 0);
             Point3D p1 = new Point3D(xVal, 0, 0);
             Point3D p2 = new Point3D(xVal, 0, zVal);

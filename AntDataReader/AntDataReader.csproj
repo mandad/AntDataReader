@@ -56,7 +56,6 @@
     <Compile Include="ANTCommands.cs" />
     <Compile Include="ANTCommunication.cs" />
     <Compile Include="ANTDataInterpreter.cs" />
-    <Compile Include="ANTDisplay.cs" />
     <Compile Include="BufferedReader.cs" />
     <Compile Include="ChooseForm.cs">
       <SubType>Form</SubType>
@@ -74,7 +73,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SerialCom.cs" />
     <Compile Include="TempVal.cs" />
     <Compile Include="TeslaGuiForm.cs">
       <SubType>Form</SubType>

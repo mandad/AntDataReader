@@ -3,7 +3,7 @@
   <Class Name="AntDataReader.ANTCommands">
     <Position X="2.25" Y="7" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAQCAEAAIABAAAAEAAAAAAABAAAAAAAAAAAAoAABA=</HashCode>
+      <HashCode>AAAAQCAEAAIABAAAAEAAAAAAABCAAAAAAAAAAAoAABA=</HashCode>
       <FileName>ANTCommands.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -58,7 +58,7 @@
       </Class>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EAABCAAAEQAAAAAAAEAAAABAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>MAABCEAAERAAAAEAAEAAAABAAgAAAAAAAAAAEAAAAAA=</HashCode>
       <FileName>DataDecoder.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -85,7 +85,7 @@
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAUAAABEASEAUBUAADChIUWCiAxEHFIEogICkAICgCA=</HashCode>
+      <HashCode>AAUAAABEASEAUBUAADChIUWCiAxEHEIEogICkAIAgCA=</HashCode>
       <FileName>Form1.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -110,7 +110,7 @@
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EAQgAARABCAIEBQQxCiwIAiKIATEAIAEAkIZggAAgEA=</HashCode>
+      <HashCode>EgQggAVQBCAJGBQSxiiwIIiKIAXEIIQFAmIdwgAEgEU=</HashCode>
       <FileName>TeslaGuiForm.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.143" />

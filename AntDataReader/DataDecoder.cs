@@ -119,6 +119,9 @@ namespace AntDataReader
                     case 4:
                         sensor = SensorType.Temperature;
                         break;
+                    case 3:
+                        sensor = SensorType.Button;
+                        break;
                     default:
                         sensor = SensorType.Unknown;
                         break;
@@ -152,8 +155,20 @@ namespace AntDataReader
                     processedData[2].value = GetAnalogNum(rawPacket[7], rawPacket[8]);
                     processedData[2].valid = true;
                     break;
+                case SensorType.Button:
+                    processedData = new DataItem[1];
+                    processedData[0] = new DataItem();
+                    processedData[0].type = DataType.Digital;
+                    processedData[0].valid = true;
+                    processedData[0].value = GetDigitalVal(rawPacket[4]);
+                    break;
             }
 
+        }
+
+        private int GetDigitalVal(byte rawData)
+        {
+            return (rawData >> 4) & 0x01;
         }
 
         /// <summary>

@@ -34,7 +34,6 @@
             this.btnOpenChannel = new System.Windows.Forms.Button();
             this.lblComStatus = new System.Windows.Forms.Label();
             this.lblChannelStatus = new System.Windows.Forms.Label();
-            this.asyncTimer = new System.Windows.Forms.Timer();
             this.cmbPort = new System.Windows.Forms.ComboBox();
             this.txtDisplay = new System.Windows.Forms.TextBox();
             this.btnClearDisplay = new System.Windows.Forms.Button();
@@ -92,11 +91,6 @@
             this.lblChannelStatus.TabIndex = 3;
             this.lblChannelStatus.Text = "Closed";
             this.lblChannelStatus.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // asyncTimer
-            // 
-            this.asyncTimer.Interval = 5000;
-            this.asyncTimer.Tick += new System.EventHandler(this.asyncTimer_Tick);
             // 
             // cmbPort
             // 
@@ -254,7 +248,6 @@
         private System.Windows.Forms.Button btnOpenChannel;
         private System.Windows.Forms.Label lblComStatus;
         private System.Windows.Forms.Label lblChannelStatus;
-        private System.Windows.Forms.Timer asyncTimer;
         private System.Windows.Forms.ComboBox cmbPort;
         private System.Windows.Forms.TextBox txtDisplay;
         private System.Windows.Forms.Button btnClearDisplay;

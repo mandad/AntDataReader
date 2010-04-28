@@ -5,6 +5,9 @@ using System.Text;
 
 namespace AntDataReader
 {
+    /// <summary>
+    /// The interface defining a class that can recieve callbacks from the AntCommunication and BufferedReader classes
+    /// </summary>
     interface ANTDataInterpreter
     {
         void HaveMessages();

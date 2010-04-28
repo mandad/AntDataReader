@@ -30,6 +30,16 @@
             <param name="p2">The third point</param>
             <returns>The triangle as a model</returns>
         </member>
+        <member name="P:AntDataReader.CubeBuilder.CubeColor">
+            <summary>
+            The color of the rectangle
+            </summary>
+        </member>
+        <member name="T:AntDataReader.CubeBuilder.Direction">
+            <summary>
+            Represents a direction to draw the rod
+            </summary>
+        </member>
         <member name="T:AntDataReader.VectorHelper">
             <summary>
             Contains vector manipulation functions
@@ -121,6 +131,11 @@
             The GUI form that displays received data
             </summary>
         </member>
+        <member name="T:AntDataReader.ANTDataInterpreter">
+            <summary>
+            The interface defining a class that can recieve callbacks from the AntCommunication and BufferedReader classes
+            </summary>
+        </member>
         <member name="M:AntDataReader.frmTeslaGui.#ctor(AntDataReader.frmChoose)">
             <summary>
             Initialized the GUI
@@ -130,15 +145,17 @@
         </member>
         <member name="M:AntDataReader.frmTeslaGui.simTimer_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
             <summary>
-            Creates a simulation packet for testing
+            EVENT: Creates a simulation packet for testing
             </summary>
+            <remarks>Called every 100ms</remarks>
             <param name="sender"></param>
             <param name="e"></param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.flashTimer_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
             <summary>
-            Resets the flash "LED" color back to normal
+            EVENT: Resets the flash "LED" color back to normal
             </summary>
+            <remarks>Called 50ms after being set green</remarks>
             <param name="sender"></param>
             <param name="e"></param>
         </member>
@@ -149,14 +166,14 @@
         </member>
         <member name="M:AntDataReader.frmTeslaGui.serialPort_DataReceived(System.Object,System.IO.Ports.SerialDataReceivedEventArgs)">
             <summary>
-            Processes data when it is received by the serial port
+            EVENT: Processes data when it is received by the serial port
             </summary>
             <param name="sender"></param>
             <param name="e"></param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.startToolStripMenuItem_Click(System.Object,System.EventArgs)">
             <summary>
-            Opens the serial port and ANT protocol when the "Start" menu item is clicked 
+            EVENT: Opens the serial port and ANT protocol when the "Start" menu item is clicked 
             </summary>
             <param name="sender"></param>
             <param name="e"></param>
@@ -309,6 +326,108 @@
             <summary>
             The debug display form
             </summary>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.#ctor(AntDataReader.frmChoose)">
+            <summary>
+            Initialized the debug form
+            </summary>
+            <param name="parent">The parent chooser form</param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.serialPort_DataReceived(System.Object,System.IO.Ports.SerialDataReceivedEventArgs)">
+            <summary>
+            EVENT: Called when the serial port recieves data
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.UpdateLabelFunction(System.String)">
+            <summary>
+            Updates the channel status label
+            </summary>
+            <param name="newText">Text to set as label text</param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.RemoteDisplayUpdate(System.String)">
+            <summary>
+            Called to update the display in a threadsafe manner
+            </summary>
+            <param name="addText">Text to add to the main display</param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.UpdateDisplayTextFunction(System.String)">
+            <summary>
+            Updates the main display text by adding new text to the bottom
+            </summary>
+            <param name="toAdd">The text to add</param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.btnOpenCom_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the "Open COM" button is clicked
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.btnTest_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the "Open Channel" button is clicked
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.cmbPort_SelectionChangeCommitted(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the serial port dropdown selection changes
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.btnClearDisplay_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when "Clear Display" is clicked
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.frmDisplay_FormClosing(System.Object,System.Windows.Forms.FormClosingEventArgs)">
+            <summary>
+            EVENT: Closes the ANT channel as the form closes
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.frmDisplay_FormClosed(System.Object,System.Windows.Forms.FormClosedEventArgs)">
+            <summary>
+            EVENT: Closes the chooser form after the form has closed
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.btnScanMode_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when "Open Rx Scan Mode" is clicked
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.cbAscii_CheckStateChanged(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the "Ascii Mode" checkbox changes state
+            Sets the decoding display mode
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.btnReset_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the reset button is clicked, resets ANT
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.cmbBaudRate_SelectionChangeCommitted(System.Object,System.EventArgs)">
+            <summary>
+            Called when the baud rate dropdown is clicked
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
         </member>
         <member name="M:AntDataReader.frmDisplay.HaveMessages">
             <summary>
@@ -481,6 +600,42 @@
             </summary>
             <summary>
             UserControl1
+            </summary>
+        </member>
+        <member name="M:AntDataReader.UserControl1.#ctor">
+            <summary>
+            Initialized the control and renders the inital drawing
+            </summary>
+        </member>
+        <member name="M:AntDataReader.UserControl1.RotateX(System.Double)">
+            <summary>
+            Rotates the object around the X axis
+            </summary>
+            <param name="angle">The angle by which to rotate (Degrees)</param>
+        </member>
+        <member name="M:AntDataReader.UserControl1.RotateY(System.Double)">
+            <summary>
+            Rotates the object around the Y axis
+            </summary>
+            <param name="angle">The angle by which to rotate (degrees)</param>
+        </member>
+        <member name="M:AntDataReader.UserControl1.RotateZ(System.Double)">
+            <summary>
+            Rotates the object around the Z axis
+            </summary>
+            <param name="angle">The angle by which to rotate (degrees)</param>
+        </member>
+        <member name="M:AntDataReader.UserControl1.UpdateDisplay(System.Double,System.Double,System.Double)">
+            <summary>
+            Updates the positions
+            </summary>
+            <param name="x">The X direction acceleration</param>
+            <param name="y">The Y direction acceleration</param>
+            <param name="z">The Z direction acceleration</param>
+        </member>
+        <member name="M:AntDataReader.UserControl1.Render">
+            <summary>
+            Performs the initial rendering
             </summary>
         </member>
         <member name="M:AntDataReader.UserControl1.InitializeComponent">

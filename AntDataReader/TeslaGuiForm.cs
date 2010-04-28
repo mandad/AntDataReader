@@ -80,7 +80,7 @@ namespace AntDataReader
             simTimer = new System.Timers.Timer(100);
             simTimer.Elapsed += new System.Timers.ElapsedEventHandler(simTimer_Elapsed);
 
-            pastTemps = new Queue<double>(100);
+            pastTemps = new Queue<double>(150);
 
             lblError.Text = "";
             lblLastMessage.Text = "";
@@ -89,8 +89,9 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Creates a simulation packet for testing
+        /// EVENT: Creates a simulation packet for testing
         /// </summary>
+        /// <remarks>Called every 100ms</remarks>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void simTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -123,8 +124,9 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Resets the flash "LED" color back to normal
+        /// EVENT: Resets the flash "LED" color back to normal
         /// </summary>
+        /// <remarks>Called 50ms after being set green</remarks>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void flashTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -145,7 +147,7 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Processes data when it is received by the serial port
+        /// EVENT: Processes data when it is received by the serial port
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -157,7 +159,7 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Opens the serial port and ANT protocol when the "Start" menu item is clicked 
+        /// EVENT: Opens the serial port and ANT protocol when the "Start" menu item is clicked 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -257,7 +259,7 @@ namespace AntDataReader
                             dataValue = tempConv.GetTemp(dataValue);
                             dataValue = Math.Round(dataValue, 2);
                             pastTemps.Enqueue(dataValue);
-                            if (pastTemps.Count == 100)
+                            if (pastTemps.Count == 150)
                             {
                                 pastTemps.Dequeue();
                             }
@@ -273,6 +275,10 @@ namespace AntDataReader
                             toPass[0] = Math.Round(xValue,3);
                             toPass[1] = Math.Round(yValue,3);
                             toPass[2] = Math.Round(zValue,3);
+                            break;
+                        case DataDecoder.SensorType.Button:
+                            toPass = new object[1];
+                            toPass[0] = Convert.ToBoolean(data.ProcessedData[0].value);
                             break;
                         default:
                             toPass = new object[1];
@@ -380,6 +386,7 @@ namespace AntDataReader
                 case DataDecoder.SensorType.Temperature:
                     //update label
                     lblTemp.Text = parameters[0].ToString();
+                    lblTempF.Text = (Convert.ToDouble(parameters[0]) * 9 / 5 + 32).ToString();
 
                     //draw graph
                     Graphics g = lblTempGraph.CreateGraphics();
@@ -396,10 +403,20 @@ namespace AntDataReader
                     double accelX = (Convert.ToDouble(parameters[0])-2047.5) / 2047.5 * 2;
                     double accelY = (Convert.ToDouble(parameters[1])-2047.5) / 2047.5 * 2;
                     double accelZ = (Convert.ToDouble(parameters[2])-2047.5) / 2047.5 * 2;
-                    lblAccelX.Text = parameters[0].ToString();
-                    lblAccelY.Text = parameters[1].ToString();
-                    lblAccelZ.Text = parameters[2].ToString();
+                    lblAccelX.Text = accelX.ToString();
+                    lblAccelY.Text = accelY.ToString();
+                    lblAccelZ.Text = accelZ.ToString();
                     userControl11.UpdateDisplay(accelX, accelY, accelZ);
+                    break;
+                case DataDecoder.SensorType.Button:
+                    if ((bool)parameters[0])
+                    {
+                        lblButtonPress.BackColor = Color.Blue;
+                    }
+                    else
+                    {
+                        lblButtonPress.BackColor = Color.White;
+                    }
                     break;
                 default:
                     lblError.Text = "Unknown Sensor Type";
@@ -560,21 +577,6 @@ namespace AntDataReader
             catch
             {
             }
-        }
-
-        private void tbTest_Scroll(object sender, EventArgs e)
-        {
-            userControl11.RotateX(Convert.ToDouble(tbTest.Value) / Convert.ToDouble(tbTest.Maximum) * 360); 
-        }
-
-        private void tbY_Scroll(object sender, EventArgs e)
-        {
-            userControl11.RotateY(Convert.ToDouble(tbY.Value) / Convert.ToDouble(tbY.Maximum) * 360);
-        }
-
-        private void tbZ_Scroll(object sender, EventArgs e)
-        {
-            userControl11.RotateZ(Convert.ToDouble(tbZ.Value) / Convert.ToDouble(tbZ.Maximum) * 360);
         }
     }
 }

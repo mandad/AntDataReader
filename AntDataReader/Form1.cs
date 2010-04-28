@@ -28,6 +28,10 @@ namespace AntDataReader
         bool autoClear = false;
         frmChoose chooserForm;
 
+        /// <summary>
+        /// Initialized the debug form
+        /// </summary>
+        /// <param name="parent">The parent chooser form</param>
         public frmDisplay(frmChoose parent)
         {
             InitializeComponent();
@@ -45,6 +49,11 @@ namespace AntDataReader
             serialPort.PortName = cmbPort.Text;
         }
 
+        /// <summary>
+        /// EVENT: Called when the serial port recieves data
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             byte[] readData = new byte[serialPort.BytesToRead];
@@ -54,6 +63,10 @@ namespace AntDataReader
 
         #region UI Delegates
 
+        /// <summary>
+        /// Updates the channel status label
+        /// </summary>
+        /// <param name="newText">Text to set as label text</param>
         private void UpdateLabelFunction(string newText)
         {
             lblChannelStatus.Text = newText;
@@ -69,6 +82,10 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Called to update the display in a threadsafe manner
+        /// </summary>
+        /// <param name="addText">Text to add to the main display</param>
         private void RemoteDisplayUpdate(string addText)
         {
             if (!this.IsDisposed)
@@ -79,6 +96,10 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Updates the main display text by adding new text to the bottom
+        /// </summary>
+        /// <param name="toAdd">The text to add</param>
         private void UpdateDisplayTextFunction(string toAdd)
         {
             txtDisplay.Text += toAdd;
@@ -91,6 +112,11 @@ namespace AntDataReader
 
         #region UI Event Handlers
 
+        /// <summary>
+        /// EVENT: Called when the "Open COM" button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOpenCom_Click(object sender, EventArgs e)
         {
             if (!serialPort.IsOpen)
@@ -129,6 +155,11 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// EVENT: Called when the "Open Channel" button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnTest_Click(object sender, EventArgs e)
         {
             if (antComm != null)
@@ -154,6 +185,11 @@ namespace AntDataReader
 
         }
 
+        /// <summary>
+        /// EVENT: Called when the serial port dropdown selection changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmbPort_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (!serialPort.IsOpen)
@@ -162,11 +198,21 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// EVENT: Called when "Clear Display" is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnClearDisplay_Click(object sender, EventArgs e)
         {
             txtDisplay.Text = "";
         }
 
+        /// <summary>
+        /// EVENT: Closes the ANT channel as the form closes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void frmDisplay_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (antComm != null)
@@ -175,11 +221,21 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// EVENT: Closes the chooser form after the form has closed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void frmDisplay_FormClosed(object sender, FormClosedEventArgs e)
         {
             chooserForm.Close();
         }
 
+        /// <summary>
+        /// EVENT: Called when "Open Rx Scan Mode" is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnScanMode_Click(object sender, EventArgs e)
         {
             if (antComm != null)
@@ -197,15 +253,12 @@ namespace AntDataReader
             }
         }
 
-        private void asyncTimer_Tick(object sender, EventArgs e)
-        {
-            asyncTimer.Stop();
-            if (statusCallback != null)
-            {
-                statusCallback();
-            }
-        }
-
+        /// <summary>
+        /// EVENT: Called when the "Ascii Mode" checkbox changes state
+        /// Sets the decoding display mode
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cbAscii_CheckStateChanged(object sender, EventArgs e)
         {
             if (cbAscii.CheckState == CheckState.Checked)
@@ -222,7 +275,11 @@ namespace AntDataReader
             }
         }
 
-
+        /// <summary>
+        /// EVENT: Called when the reset button is clicked, resets ANT
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnReset_Click(object sender, EventArgs e)
         {
             if (antComm != null)
@@ -232,6 +289,11 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Called when the baud rate dropdown is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmbBaudRate_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (!serialPort.IsOpen)
