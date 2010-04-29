@@ -30,8 +30,15 @@
   </Class>
   <Class Name="AntDataReader.frmChoose">
     <Position X="7" Y="3.25" Width="2" />
+    <NestedTypes>
+      <Delegate Name="AntDataReader.frmChoose.HideSelf" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ChooseForm.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAgAAAACAAABAAAACAAAACAAQAAAAAAEAAAAEAAAA=</HashCode>
+      <HashCode>AAAAgAAgACAiABAAAACAQAACAAQAAAAAAEAAAAEAAAA=</HashCode>
       <FileName>ChooseForm.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -110,7 +117,7 @@
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EgQggAVQBCAJGBQSxiiwIIiKIAXEIIQFAmIdwgAEgEU=</HashCode>
+      <HashCode>MgQggAVQBCAJGBQSwiiwIIiKIAXEIIQFQmId0gAEgEU=</HashCode>
       <FileName>TeslaGuiForm.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.143" />
@@ -119,6 +126,41 @@
     <Position X="0.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.CubeBuilder">
+    <Position X="15.75" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="AntDataReader.CubeBuilder.Direction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CubeBuilder.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAAAAAAAAAEAAAAAACAEAAAA=</HashCode>
+      <FileName>CubeBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.VectorHelper">
+    <Position X="15.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CubeBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.TempVal">
+    <Position X="15.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAAAAAAAAAEACAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>TempVal.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AntDataReader.UserControl1">
+    <Position X="15.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAWAAAAAAAAAAAAAAAAAAAAAAAAAAAABABAAAAAAA=</HashCode>
+      <FileName>UserControl1.xaml.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Interface Name="AntDataReader.ANTDataInterpreter">

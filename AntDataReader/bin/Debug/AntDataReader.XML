@@ -204,6 +204,23 @@
             <param name="sensorType">The type of sensor from which the data was taken</param>
             <param name="boardId">The ID of the board</param>
         </member>
+        <member name="M:AntDataReader.frmTeslaGui.WriteToFile(System.Object[],AntDataReader.DataDecoder.SensorType,System.Int32)">
+            <summary>
+            Writes data to a local log file
+            </summary>
+            <remarks>File format is [Sensor type],[Board ID],[Data1],[Data2],...</remarks>
+            <param name="toPass">The data from the sensor</param>
+            <param name="sensorType">The type of sensor from which the data was taken</param>
+            <param name="boardId">The ID of the board</param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.WriteToWeb(System.Object[],AntDataReader.DataDecoder.SensorType,System.Int32)">
+            <summary>
+            Puts data to web server for database storage
+            </summary>
+            <param name="toPass">The data from the sensor</param>
+            <param name="sensorType">The type of sensor from which the data was taken</param>
+            <param name="boardId">The ID of the board</param>
+        </member>
         <member name="M:AntDataReader.frmTeslaGui.RemoteDisplayUpdate(System.Object[],AntDataReader.DataDecoder.SensorType,System.Int32)">
             <summary>
             Invokes the GUI update to make it thread safe
@@ -220,6 +237,11 @@
             <param name="boardID">The board from which the data originated</param>
             <param name="parameters">The data values required by that sensor</param>
         </member>
+        <member name="M:AntDataReader.frmTeslaGui.DrawTempGraph">
+            <summary>
+            Draws the temperature history graph
+            </summary>
+        </member>
         <member name="M:AntDataReader.frmTeslaGui.OnChannelClosed">
             <summary>
             Called remotely when the ANT channel is closed
@@ -234,6 +256,7 @@
             <summary>
             Called remotely to display a message
             </summary>
+            <remarks>Not implemented</remarks>
             <param name="message">The me</param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.FlashLED">
@@ -243,29 +266,57 @@
         </member>
         <member name="M:AntDataReader.frmTeslaGui.debugModeToolStripMenuItem_Click(System.Object,System.EventArgs)">
             <summary>
-            Launches the Debug mode form
+            EVENT: Launches the Debug mode form when "Debug Mode" menu item is clicked
             </summary>
             <param name="sender"></param>
             <param name="e"></param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.frmTeslaGui_FormClosed(System.Object,System.Windows.Forms.FormClosedEventArgs)">
             <summary>
-            Closes the hidden chooser form when this one is closed
+            EVENT: Closes the hidden chooser form when this one is closed
             </summary>
             <param name="sender"></param>
             <param name="e"></param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.frmTeslaGui_FormClosing(System.Object,System.Windows.Forms.FormClosingEventArgs)">
             <summary>
-            Close the ant channel and serial port when the form closes
+            EVENT: Close the ant channel and serial port when the form closes
             Stop logging data if necessary
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.stopToolStripMenuItem_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the "Stop" data collection menu item is clicked
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.simulatedToolStripMenuItem_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the "Simulation" menu item is clicked
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.saveToFileToolStripMenuItem_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the "Save to file" menu item is clicked
             </summary>
             <param name="sender"></param>
             <param name="e"></param>
         </member>
         <member name="M:AntDataReader.frmTeslaGui.dlgSaveFile_FileOk(System.Object,System.ComponentModel.CancelEventArgs)">
             <summary>
-            Handles saving the file for the log
+            EVENT: Handles saving the file for the log
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmTeslaGui.recordDataToolStripMenuItem_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when "Record Data" menu item is clicked
             </summary>
             <param name="sender"></param>
             <param name="e"></param>
@@ -561,6 +612,11 @@
             The state of a multistage function with multiple commands
             </summary>
         </member>
+        <member name="T:AntDataReader.frmChoose">
+            <summary>
+            Presents a chooser form to the user to select either the GUI or debug interface
+            </summary>
+        </member>
         <member name="F:AntDataReader.frmChoose.components">
             <summary>
             Required designer variable.
@@ -577,6 +633,38 @@
             Required method for Designer support - do not modify
             the contents of this method with the code editor.
             </summary>
+        </member>
+        <member name="M:AntDataReader.frmChoose.#ctor">
+            <summary>
+            Initializes the form and starts the GUI by default
+            Gives choice if control is held
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmChoose.tmrHide_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+            EVENT: called when the hide timer elapses, invoves the GUI function
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmChoose.HideFunction">
+            <summary>
+            Hides the form
+            </summary>
+        </member>
+        <member name="M:AntDataReader.frmChoose.btnDebugLaunch_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the launch debug button is clicked
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:AntDataReader.frmChoose.btnGUILaunch_Click(System.Object,System.EventArgs)">
+            <summary>
+            EVENT: Called when the launch GUI button is pressed
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
         </member>
         <member name="T:AntDataReader.Properties.Resources">
             <summary>

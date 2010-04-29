@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Net;
+//using Infragistics.UltraChart.Resources.Appearance;
 
 namespace AntDataReader
 {
@@ -30,6 +31,7 @@ namespace AntDataReader
         StreamWriter swLog;
         int writeCount = 0;
         TempVal tempConv;
+        bool purposeClose = false;
 
         Queue<double> pastTemps;
         byte lastTemp = 0;
@@ -77,7 +79,7 @@ namespace AntDataReader
 
             flashTimer = new System.Timers.Timer(50);
             flashTimer.Elapsed += new System.Timers.ElapsedEventHandler(flashTimer_Elapsed);
-            simTimer = new System.Timers.Timer(100);
+            simTimer = new System.Timers.Timer(500);
             simTimer.Elapsed += new System.Timers.ElapsedEventHandler(simTimer_Elapsed);
 
             pastTemps = new Queue<double>(150);
@@ -99,7 +101,7 @@ namespace AntDataReader
             //generate the temperature
             int tempADC = Convert.ToInt32(Math.Round(((Convert.ToDouble(lastTemp++) / 100) + .5) * 4096 / 2.5));
             byte LSB = Convert.ToByte(tempADC & 0xFF);
-            byte MSB = Convert.ToByte(((tempADC & 0xF00) >> 8) | 0x10);
+            byte MSB = Convert.ToByte(((tempADC & 0xF00) >> 8) | 0x80);
             if (lastTemp == 120)
             {
                 lastTemp = 0;
@@ -178,7 +180,6 @@ namespace AntDataReader
                 antComm.RxScanMode();
                 startToolStripMenuItem.Enabled = false;
                 stopToolStripMenuItem.Enabled = true;
-                pauseToolStripMenuItem.Enabled = true;
             }
         }
 
@@ -270,11 +271,11 @@ namespace AntDataReader
                             double xValue = data.ProcessedData[0].value;
                             double yValue = data.ProcessedData[1].value;
                             double zValue = data.ProcessedData[2].value;
-                            
+
                             toPass = new object[3];
-                            toPass[0] = Math.Round(xValue,3);
-                            toPass[1] = Math.Round(yValue,3);
-                            toPass[2] = Math.Round(zValue,3);
+                            toPass[0] = Math.Round(xValue, 3);
+                            toPass[1] = Math.Round(yValue, 3);
+                            toPass[2] = Math.Round(zValue, 3);
                             break;
                         case DataDecoder.SensorType.Button:
                             toPass = new object[1];
@@ -309,45 +310,70 @@ namespace AntDataReader
         /// <param name="boardId">The ID of the board</param>
         private void WriteInfo(object[] toPass, DataDecoder.SensorType sensorType, int boardId)
         {
-            writeCount++;
 
-            // write data to log
+
             if (recordDataToolStripMenuItem.Checked)
+            {
+                WriteToWeb(toPass, sensorType, boardId);
+            }
+            if (saveToFileToolStripMenuItem.Checked)
+            {
+                WriteToFile(toPass, sensorType, boardId);
+            }
+        }
+
+        /// <summary>
+        /// Writes data to a local log file
+        /// </summary>
+        /// <remarks>File format is [Sensor type],[Board ID],[Data1],[Data2],...</remarks>
+        /// <param name="toPass">The data from the sensor</param>
+        /// <param name="sensorType">The type of sensor from which the data was taken</param>
+        /// <param name="boardId">The ID of the board</param>
+        private void WriteToFile(object[] toPass, DataDecoder.SensorType sensorType, int boardId)
+        {
+            if (fsLog != null)
             {
                 switch (sensorType)
                 {
                     case DataDecoder.SensorType.Temperature:
-                        if (fsLog != null)
-                        {
-                            //File format is [Sensor type],[Board ID],[Data1],[Data2],...
-                            swLog.WriteLine("Temp," + boardId.ToString() + "," + toPass[0].ToString());
-                        }
-
-                        //only write to the web every so often
-                        if ((!simulatedToolStripMenuItem.Checked || (writeCount > 10)) && !thrdWebSubmit.IsBusy)
-                        {
-                            thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=temp&id=" + boardId.ToString()
-                                + "&data[0]=" + toPass[0].ToString());
-                            writeCount = 0;
-                        }
+                        swLog.WriteLine("Temp," + boardId.ToString() + "," + toPass[0].ToString());
                         break;
                     case DataDecoder.SensorType.Accelerometer:
-                        if (fsLog != null)
-                        {
-                            //File format is [Sensor type],[Board ID],[Data1],[Data2],...
-                            swLog.WriteLine("Accel," + boardId.ToString() + "," + toPass[0].ToString() + "," + toPass[1].ToString() 
-                                + "," + toPass[2].ToString());
-                        }
-
-                        //only write to the web every so often
-                        if ((!simulatedToolStripMenuItem.Checked || (writeCount > 10)) && !thrdWebSubmit.IsBusy)
-                        {
-                            thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=accel&id=" + boardId.ToString()
-                                + "&data[0]=" + toPass[0].ToString() + "&data[1]=" + toPass[1].ToString() + "&data[2]=" + toPass[2].ToString());
-                            writeCount = 0;
-                        }
+                        swLog.WriteLine("Accel," + boardId.ToString() + "," + toPass[0].ToString() + "," + toPass[1].ToString()
+                            + "," + toPass[2].ToString());
                         break;
-                    default:
+                    case DataDecoder.SensorType.Button:
+                        swLog.WriteLine("Temp," + boardId.ToString() + "," + toPass[0].ToString());
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Puts data to web server for database storage
+        /// </summary>
+        /// <param name="toPass">The data from the sensor</param>
+        /// <param name="sensorType">The type of sensor from which the data was taken</param>
+        /// <param name="boardId">The ID of the board</param>
+        private void WriteToWeb(object[] toPass, DataDecoder.SensorType sensorType, int boardId)
+        {
+            writeCount++;
+            if ((!simulatedToolStripMenuItem.Checked || (writeCount > 10)) && !thrdWebSubmit.IsBusy)
+            {
+                writeCount = 0;
+                switch (sensorType)
+                {
+                    case DataDecoder.SensorType.Temperature:
+                        thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=temp&id=" + boardId.ToString()
+                            + "&data[0]=" + toPass[0].ToString());
+                        break;
+                    case DataDecoder.SensorType.Accelerometer:
+                        thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=accel&id=" + boardId.ToString()
+                            + "&data[0]=" + toPass[0].ToString() + "&data[1]=" + toPass[1].ToString() + "&data[2]=" + toPass[2].ToString());
+                        break;
+                    case DataDecoder.SensorType.Button:
+                        thrdWebSubmit.RunWorkerAsync("http://www.dmanda.com/capstone/putdata.php?datatype=button&id=" + boardId.ToString()
+                            + "&data[0]=" + toPass[0].ToString());
                         break;
                 }
             }
@@ -367,7 +393,11 @@ namespace AntDataReader
                 pass[0] = sensor;
                 pass[1] = sensorBoard;
                 pass[2] = passIn;
-                this.Invoke(this.updateGUI, pass);
+                try
+                {
+                    this.Invoke(this.updateGUI, pass);
+                }
+                catch { }
             }
         }
 
@@ -389,23 +419,18 @@ namespace AntDataReader
                     lblTempF.Text = (Convert.ToDouble(parameters[0]) * 9 / 5 + 32).ToString();
 
                     //draw graph
-                    Graphics g = lblTempGraph.CreateGraphics();
-                    g.Clear(Color.LightGray);
-                    double[] graphPts = pastTemps.ToArray();
-                    Pen graphPen = new Pen(Color.Blue, 3);
-                    for (int i = 0; i < graphPts.Length; i++)
-                    {
-                        g.DrawLine(graphPen, 2 * i, lblTempGraph.Height - Convert.ToInt32(Math.Round(2 * graphPts[i], 0)),
-                            (2 * i) + 2, lblTempGraph.Height - Convert.ToInt32(Math.Round(2 * graphPts[i])));
-                    }
+                    DrawTempGraph();
+
+                    //chrtTempHist.Data.DataSource = graphPts;
+                    //chrtTempHist.Data.DataBind();
                     break;
                 case DataDecoder.SensorType.Accelerometer:
-                    double accelX = (Convert.ToDouble(parameters[0])-2047.5) / 2047.5 * 2;
-                    double accelY = (Convert.ToDouble(parameters[1])-2047.5) / 2047.5 * 2;
-                    double accelZ = (Convert.ToDouble(parameters[2])-2047.5) / 2047.5 * 2;
-                    lblAccelX.Text = accelX.ToString();
-                    lblAccelY.Text = accelY.ToString();
-                    lblAccelZ.Text = accelZ.ToString();
+                    double accelX = (Convert.ToDouble(parameters[0]) - 2047.5) / 2047.5 * 2;
+                    double accelY = (Convert.ToDouble(parameters[1]) - 2047.5) / 2047.5 * 2;
+                    double accelZ = (Convert.ToDouble(parameters[2]) - 2047.5) / 2047.5 * 2;
+                    lblAccelX.Text = Math.Round(accelX, 2).ToString() + " G";
+                    lblAccelY.Text = Math.Round(accelY, 2).ToString() + " G";
+                    lblAccelZ.Text = Math.Round(accelZ, 2).ToString() + " G";
                     userControl11.UpdateDisplay(accelX, accelY, accelZ);
                     break;
                 case DataDecoder.SensorType.Button:
@@ -425,11 +450,37 @@ namespace AntDataReader
         }
 
         /// <summary>
+        /// Draws the temperature history graph
+        /// </summary>
+        private void DrawTempGraph()
+        {
+            Graphics g = lblTempGraph.CreateGraphics();
+            g.Clear(Color.White);
+            double[] graphPts = pastTemps.ToArray();
+            Pen graphPen = new Pen(Color.Blue, 3);
+
+            for (int i = 0; i < graphPts.Length; i++)
+            {
+                g.DrawLine(graphPen, 2 * i, lblTempGraph.Height - Convert.ToInt32(Math.Round(2 * graphPts[i], 0)),
+                    (2 * i) + 2, lblTempGraph.Height - Convert.ToInt32(Math.Round(2 * graphPts[i])));
+            }
+        }
+
+        /// <summary>
         /// Called remotely when the ANT channel is closed
         /// </summary>
         public void OnChannelClosed()
         {
-            antComm.OpenChannel();
+            if (purposeClose)
+            {
+                purposeClose = false;
+                startToolStripMenuItem.Enabled = true;
+                stopToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                antComm.OpenChannel();
+            }
         }
 
         /// <summary>
@@ -443,6 +494,7 @@ namespace AntDataReader
         /// <summary>
         /// Called remotely to display a message
         /// </summary>
+        /// <remarks>Not implemented</remarks>
         /// <param name="message">The me</param>
         public void DisplayMessage(string message)
         {
@@ -462,7 +514,7 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Launches the Debug mode form
+        /// EVENT: Launches the Debug mode form when "Debug Mode" menu item is clicked
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -482,7 +534,7 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Closes the hidden chooser form when this one is closed
+        /// EVENT: Closes the hidden chooser form when this one is closed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -492,7 +544,7 @@ namespace AntDataReader
         }
 
         /// <summary>
-        /// Close the ant channel and serial port when the form closes
+        /// EVENT: Close the ant channel and serial port when the form closes
         /// Stop logging data if necessary
         /// </summary>
         /// <param name="sender"></param>
@@ -510,12 +562,31 @@ namespace AntDataReader
             }
         }
 
-
+        /// <summary>
+        /// EVENT: Called when the "Stop" data collection menu item is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            antComm.CloseChannel();
+            if (antComm.ChannelOpen)
+            {
+                purposeClose = true;
+                antComm.CloseChannel();
+            }
+            else
+            {
+                //allow the user to try again
+                startToolStripMenuItem.Enabled = true;
+                stopToolStripMenuItem.Enabled = false;
+            }
         }
 
+        /// <summary>
+        /// EVENT: Called when the "Simulation" menu item is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void simulatedToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (simulatedToolStripMenuItem.Checked)
@@ -528,13 +599,26 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// EVENT: Called when the "Save to file" menu item is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dlgSaveFile.ShowDialog();
+            if (!saveToFileToolStripMenuItem.Checked)
+            {
+                dlgSaveFile.ShowDialog();
+            }
+            else
+            {
+                fsLog.Close();
+                fsLog = null;
+            }
         }
 
         /// <summary>
-        /// Handles saving the file for the log
+        /// EVENT: Handles saving the file for the log
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -545,7 +629,7 @@ namespace AntDataReader
                 fsLog = new FileStream(dlgSaveFile.FileName, FileMode.Create);
                 swLog = new StreamWriter(fsLog);
                 //recordDataToolStripMenuItem.Enabled = true;
-                recordDataToolStripMenuItem.Checked = true;
+                saveToFileToolStripMenuItem.Checked = true;
             }
             catch (IOException ex)
             {
@@ -554,6 +638,11 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// EVENT: Called when "Record Data" menu item is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void recordDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!recordDataToolStripMenuItem.Checked)
@@ -574,7 +663,7 @@ namespace AntDataReader
             {
                 request.GetResponse();
             }
-            catch
+            catch   //this will eliminate errors due to timeouts
             {
             }
         }

@@ -37,7 +37,6 @@
             this.dataCollectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.recordingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.recordDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,15 +56,15 @@
             this.lblAccelZ = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.wpfHost = new System.Windows.Forms.Integration.ElementHost();
+            this.userControl11 = new AntDataReader.UserControl1();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.lblTempF = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.lblButtonPress = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.wpfHost = new System.Windows.Forms.Integration.ElementHost();
-            this.userControl11 = new AntDataReader.UserControl1();
+            this.lblButtonPress = new System.Windows.Forms.Label();
             this.mnuMain.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -121,8 +120,7 @@
             // 
             this.dataCollectionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.startToolStripMenuItem,
-            this.stopToolStripMenuItem,
-            this.pauseToolStripMenuItem});
+            this.stopToolStripMenuItem});
             this.dataCollectionToolStripMenuItem.Name = "dataCollectionToolStripMenuItem";
             this.dataCollectionToolStripMenuItem.Size = new System.Drawing.Size(100, 20);
             this.dataCollectionToolStripMenuItem.Text = "Data Collection";
@@ -130,7 +128,7 @@
             // startToolStripMenuItem
             // 
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.startToolStripMenuItem.Text = "Start";
             this.startToolStripMenuItem.Click += new System.EventHandler(this.startToolStripMenuItem_Click);
             // 
@@ -138,17 +136,9 @@
             // 
             this.stopToolStripMenuItem.Enabled = false;
             this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-            this.stopToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
+            this.stopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.stopToolStripMenuItem.Text = "Stop";
             this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
-            // 
-            // pauseToolStripMenuItem
-            // 
-            this.pauseToolStripMenuItem.CheckOnClick = true;
-            this.pauseToolStripMenuItem.Enabled = false;
-            this.pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
-            this.pauseToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
-            this.pauseToolStripMenuItem.Text = "Pause";
             // 
             // recordingToolStripMenuItem
             // 
@@ -162,16 +152,18 @@
             // saveToFileToolStripMenuItem
             // 
             this.saveToFileToolStripMenuItem.Name = "saveToFileToolStripMenuItem";
-            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.saveToFileToolStripMenuItem.Text = "Save to File";
             this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveToFileToolStripMenuItem_Click);
             // 
             // recordDataToolStripMenuItem
             // 
+            this.recordDataToolStripMenuItem.Checked = true;
             this.recordDataToolStripMenuItem.CheckOnClick = true;
+            this.recordDataToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.recordDataToolStripMenuItem.Name = "recordDataToolStripMenuItem";
-            this.recordDataToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
-            this.recordDataToolStripMenuItem.Text = "Record Data";
+            this.recordDataToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.recordDataToolStripMenuItem.Text = "Send To Web";
             this.recordDataToolStripMenuItem.Click += new System.EventHandler(this.recordDataToolStripMenuItem_Click);
             // 
             // lblDataLED
@@ -253,7 +245,7 @@
             // 
             this.lblAccelX.AutoSize = true;
             this.lblAccelX.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAccelX.Location = new System.Drawing.Point(43, 30);
+            this.lblAccelX.Location = new System.Drawing.Point(57, 100);
             this.lblAccelX.Name = "lblAccelX";
             this.lblAccelX.Size = new System.Drawing.Size(31, 20);
             this.lblAccelX.TabIndex = 7;
@@ -263,7 +255,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(14, 30);
+            this.label3.Location = new System.Drawing.Point(28, 100);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(24, 20);
             this.label3.TabIndex = 6;
@@ -273,7 +265,7 @@
             // 
             this.lblAccelY.AutoSize = true;
             this.lblAccelY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAccelY.Location = new System.Drawing.Point(43, 62);
+            this.lblAccelY.Location = new System.Drawing.Point(57, 132);
             this.lblAccelY.Name = "lblAccelY";
             this.lblAccelY.Size = new System.Drawing.Size(31, 20);
             this.lblAccelY.TabIndex = 9;
@@ -283,7 +275,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(14, 62);
+            this.label5.Location = new System.Drawing.Point(28, 132);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(24, 20);
             this.label5.TabIndex = 8;
@@ -293,7 +285,7 @@
             // 
             this.lblAccelZ.AutoSize = true;
             this.lblAccelZ.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAccelZ.Location = new System.Drawing.Point(43, 92);
+            this.lblAccelZ.Location = new System.Drawing.Point(57, 162);
             this.lblAccelZ.Name = "lblAccelZ";
             this.lblAccelZ.Size = new System.Drawing.Size(31, 20);
             this.lblAccelZ.TabIndex = 11;
@@ -303,7 +295,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(14, 92);
+            this.label7.Location = new System.Drawing.Point(28, 162);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(23, 20);
             this.label7.TabIndex = 10;
@@ -325,6 +317,15 @@
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Accelerometer";
+            // 
+            // wpfHost
+            // 
+            this.wpfHost.Location = new System.Drawing.Point(160, 21);
+            this.wpfHost.Name = "wpfHost";
+            this.wpfHost.Size = new System.Drawing.Size(308, 257);
+            this.wpfHost.TabIndex = 13;
+            this.wpfHost.Text = "elementHost1";
+            this.wpfHost.Child = this.userControl11;
             // 
             // groupBox2
             // 
@@ -384,31 +385,22 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Button";
             // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(14, 42);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(71, 20);
+            this.label8.TabIndex = 1;
+            this.label8.Text = "Pressed:";
+            // 
             // lblButtonPress
             // 
             this.lblButtonPress.Location = new System.Drawing.Point(91, 25);
             this.lblButtonPress.Name = "lblButtonPress";
             this.lblButtonPress.Size = new System.Drawing.Size(92, 55);
             this.lblButtonPress.TabIndex = 0;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(14, 45);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(71, 20);
-            this.label8.TabIndex = 1;
-            this.label8.Text = "Pressed:";
-            // 
-            // wpfHost
-            // 
-            this.wpfHost.Location = new System.Drawing.Point(160, 21);
-            this.wpfHost.Name = "wpfHost";
-            this.wpfHost.Size = new System.Drawing.Size(308, 257);
-            this.wpfHost.TabIndex = 13;
-            this.wpfHost.Text = "elementHost1";
-            this.wpfHost.Child = this.userControl11;
             // 
             // frmTeslaGui
             // 
@@ -428,7 +420,7 @@
             this.MainMenuStrip = this.mnuMain;
             this.Name = "frmTeslaGui";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "Sensor Data";
+            this.Text = "Tesla Data Display";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmTeslaGui_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmTeslaGui_FormClosed);
             this.mnuMain.ResumeLayout(false);
@@ -455,7 +447,6 @@
         private System.Windows.Forms.ToolStripMenuItem dataCollectionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem startToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stopToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem pauseToolStripMenuItem;
         private System.Windows.Forms.Label lblDataLED;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lblTemp;
