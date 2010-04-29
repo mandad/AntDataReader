@@ -32,6 +32,7 @@ namespace AntDataReader
         int writeCount = 0;
         TempVal tempConv;
         bool purposeClose = false;
+        Dictionary<DataDecoder.SensorType, int> lastRecieved;
 
         Queue<double> pastTemps;
         byte lastTemp = 0;
@@ -77,6 +78,7 @@ namespace AntDataReader
             spBuffer = new BufferedReader(this);
             tempConv = new TempVal();
 
+            //Initialize timers
             flashTimer = new System.Timers.Timer(50);
             flashTimer.Elapsed += new System.Timers.ElapsedEventHandler(flashTimer_Elapsed);
             simTimer = new System.Timers.Timer(500);
@@ -84,10 +86,15 @@ namespace AntDataReader
 
             pastTemps = new Queue<double>(150);
 
+            //Clear labels
             lblError.Text = "";
             lblLastMessage.Text = "";
 
-            //wpfHost.Refresh();
+            //Set up last received
+            lastRecieved = new Dictionary<DataDecoder.SensorType, int>(3);
+            lastRecieved.Add(DataDecoder.SensorType.Temperature, 100);
+            lastRecieved.Add(DataDecoder.SensorType.Accelerometer, 100);
+            lastRecieved.Add(DataDecoder.SensorType.Button, 100);
         }
 
         /// <summary>
@@ -250,6 +257,10 @@ namespace AntDataReader
                 if (data.Sensor != DataDecoder.SensorType.InvalidData)
                 {
                     object[] toPass;
+                    lastRecieved[DataDecoder.SensorType.Accelerometer]++;
+                    lastRecieved[DataDecoder.SensorType.Button]++;
+                    lastRecieved[DataDecoder.SensorType.Temperature]++;
+                    lastRecieved[data.Sensor] = 0;
                     switch (data.Sensor)
                     {
                         case DataDecoder.SensorType.Temperature:
@@ -409,6 +420,8 @@ namespace AntDataReader
         /// <param name="parameters">The data values required by that sensor</param>
         private void UpdateGUIFunction(DataDecoder.SensorType senseType, int boardID, object[] parameters)
         {
+            HideShowBlocks();
+
             lblError.Text = "";
             lblLastMessage.Text = DateTime.Now.ToLongTimeString();
             switch (senseType)
@@ -443,9 +456,48 @@ namespace AntDataReader
                         lblButtonPress.BackColor = Color.White;
                     }
                     break;
-                default:
+                case DataDecoder.SensorType.Unknown:
                     lblError.Text = "Unknown Sensor Type";
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Hides blocks for data that is not being received
+        /// </summary>
+        private void HideShowBlocks()
+        {
+            //Accelerometer
+            if (lastRecieved[DataDecoder.SensorType.Accelerometer] > 10)
+            {
+                lastRecieved[DataDecoder.SensorType.Accelerometer] = 10;
+                grpAccel.Visible = false;
+            }
+            else
+            {
+                grpAccel.Visible = true;
+            }
+
+            //Temperature
+            if (lastRecieved[DataDecoder.SensorType.Temperature] > 10)
+            {
+                lastRecieved[DataDecoder.SensorType.Temperature] = 10;
+                grpTemp.Visible = false;
+            }
+            else
+            {
+                grpTemp.Visible = true;
+            }
+
+            //Button
+            if (lastRecieved[DataDecoder.SensorType.Button] > 10)
+            {
+                lastRecieved[DataDecoder.SensorType.Button] = 10;
+                grpButton.Visible = false;
+            }
+            else
+            {
+                grpButton.Visible = true;
             }
         }
 

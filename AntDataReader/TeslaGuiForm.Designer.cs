@@ -55,21 +55,21 @@
             this.label5 = new System.Windows.Forms.Label();
             this.lblAccelZ = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.grpAccel = new System.Windows.Forms.GroupBox();
             this.wpfHost = new System.Windows.Forms.Integration.ElementHost();
             this.userControl11 = new AntDataReader.UserControl1();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.grpTemp = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.lblTempF = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.grpButton = new System.Windows.Forms.GroupBox();
             this.label8 = new System.Windows.Forms.Label();
             this.lblButtonPress = new System.Windows.Forms.Label();
             this.mnuMain.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
+            this.grpAccel.SuspendLayout();
+            this.grpTemp.SuspendLayout();
+            this.grpButton.SuspendLayout();
             this.SuspendLayout();
             // 
             // mnuMain
@@ -301,22 +301,22 @@
             this.label7.TabIndex = 10;
             this.label7.Text = "Z:";
             // 
-            // groupBox1
+            // grpAccel
             // 
-            this.groupBox1.Controls.Add(this.wpfHost);
-            this.groupBox1.Controls.Add(this.lblAccelZ);
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.label7);
-            this.groupBox1.Controls.Add(this.lblAccelX);
-            this.groupBox1.Controls.Add(this.lblAccelY);
-            this.groupBox1.Controls.Add(this.label5);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(12, 220);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(482, 287);
-            this.groupBox1.TabIndex = 12;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Accelerometer";
+            this.grpAccel.Controls.Add(this.wpfHost);
+            this.grpAccel.Controls.Add(this.lblAccelZ);
+            this.grpAccel.Controls.Add(this.label3);
+            this.grpAccel.Controls.Add(this.label7);
+            this.grpAccel.Controls.Add(this.lblAccelX);
+            this.grpAccel.Controls.Add(this.lblAccelY);
+            this.grpAccel.Controls.Add(this.label5);
+            this.grpAccel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.grpAccel.Location = new System.Drawing.Point(12, 220);
+            this.grpAccel.Name = "grpAccel";
+            this.grpAccel.Size = new System.Drawing.Size(482, 287);
+            this.grpAccel.TabIndex = 12;
+            this.grpAccel.TabStop = false;
+            this.grpAccel.Text = "Accelerometer";
             // 
             // wpfHost
             // 
@@ -327,20 +327,20 @@
             this.wpfHost.Text = "elementHost1";
             this.wpfHost.Child = this.userControl11;
             // 
-            // groupBox2
+            // grpTemp
             // 
-            this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Controls.Add(this.lblTempF);
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Controls.Add(this.lblTemp);
-            this.groupBox2.Controls.Add(this.lblTempGraph);
-            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox2.Location = new System.Drawing.Point(12, 36);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(482, 168);
-            this.groupBox2.TabIndex = 13;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Temperature";
+            this.grpTemp.Controls.Add(this.label2);
+            this.grpTemp.Controls.Add(this.lblTempF);
+            this.grpTemp.Controls.Add(this.label1);
+            this.grpTemp.Controls.Add(this.lblTemp);
+            this.grpTemp.Controls.Add(this.lblTempGraph);
+            this.grpTemp.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.grpTemp.Location = new System.Drawing.Point(12, 36);
+            this.grpTemp.Name = "grpTemp";
+            this.grpTemp.Size = new System.Drawing.Size(482, 168);
+            this.grpTemp.TabIndex = 13;
+            this.grpTemp.TabStop = false;
+            this.grpTemp.Text = "Temperature";
             // 
             // label2
             // 
@@ -373,17 +373,17 @@
             this.label4.Text = "T\r\nE\r\nS\r\nL\r\nA\r\n\r\nD\r\nA\r\nT\r\nA";
             this.label4.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // groupBox3
+            // grpButton
             // 
-            this.groupBox3.Controls.Add(this.label8);
-            this.groupBox3.Controls.Add(this.lblButtonPress);
-            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox3.Location = new System.Drawing.Point(12, 522);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(482, 93);
-            this.groupBox3.TabIndex = 15;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Button";
+            this.grpButton.Controls.Add(this.label8);
+            this.grpButton.Controls.Add(this.lblButtonPress);
+            this.grpButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.grpButton.Location = new System.Drawing.Point(12, 522);
+            this.grpButton.Name = "grpButton";
+            this.grpButton.Size = new System.Drawing.Size(482, 93);
+            this.grpButton.TabIndex = 15;
+            this.grpButton.TabStop = false;
+            this.grpButton.Text = "Button";
             // 
             // label8
             // 
@@ -408,13 +408,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(533, 648);
-            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.grpButton);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.grpAccel);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.lblDataLED);
             this.Controls.Add(this.mnuMain);
-            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.grpTemp);
             this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.mnuMain;
@@ -427,12 +427,12 @@
             this.mnuMain.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
+            this.grpAccel.ResumeLayout(false);
+            this.grpAccel.PerformLayout();
+            this.grpTemp.ResumeLayout(false);
+            this.grpTemp.PerformLayout();
+            this.grpButton.ResumeLayout(false);
+            this.grpButton.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -465,15 +465,15 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lblAccelZ;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox grpAccel;
         private System.Windows.Forms.Integration.ElementHost wpfHost;
         private UserControl1 userControl11;
         private System.Windows.Forms.ToolStripStatusLabel lblLastMessage;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox grpTemp;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lblTempF;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox grpButton;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label lblButtonPress;
     }

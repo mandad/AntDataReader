@@ -166,6 +166,11 @@ namespace AntDataReader
 
         }
 
+        /// <summary>
+        /// Extracts the digital value bit from a data packet byte
+        /// </summary>
+        /// <param name="rawData">The byte containing the digital bit in the 000x0000 position</param>
+        /// <returns>1 or 0 as per the digital value</returns>
         private int GetDigitalVal(byte rawData)
         {
             return (rawData >> 4) & 0x01;

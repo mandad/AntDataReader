@@ -71,6 +71,11 @@ namespace AntDataReader
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// DEPRECATED: Used for ghetto asynch communications
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void waitTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (responseReceived || !needsResponse)

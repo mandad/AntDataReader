@@ -237,6 +237,11 @@
             <param name="boardID">The board from which the data originated</param>
             <param name="parameters">The data values required by that sensor</param>
         </member>
+        <member name="M:AntDataReader.frmTeslaGui.HideShowBlocks">
+            <summary>
+            Hides blocks for data that is not being received
+            </summary>
+        </member>
         <member name="M:AntDataReader.frmTeslaGui.DrawTempGraph">
             <summary>
             Draws the temperature history graph
@@ -485,6 +490,24 @@
             This function will be called remotely when the buffer has read a full message
             </summary>
         </member>
+        <member name="M:AntDataReader.frmDisplay.OnChannelClosed">
+            <summary>
+            Updates the label to show that the channel has been closed
+            </summary>
+            <remarks>Called remotely</remarks>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.OnChannelOpened">
+            <summary>
+            Updates the label to show that the channel has been opened
+            </summary>
+            <remarks>Called remotely</remarks>
+        </member>
+        <member name="M:AntDataReader.frmDisplay.DisplayMessage(System.String)">
+            <summary>
+            Called remotely to display a message
+            </summary>
+            <param name="message">The string to display</param>
+        </member>
         <member name="F:AntDataReader.frmDisplay.components">
             <summary>
             Required designer variable.
@@ -549,6 +572,13 @@
             Fills a dictionary with keys of response message codes and values of their description
             </summary>
             <returns>the filled dictionary</returns>
+        </member>
+        <member name="M:AntDataReader.ANTCommunication.waitTimer_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+            DEPRECATED: Used for ghetto asynch communications
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
         </member>
         <member name="M:AntDataReader.ANTCommunication.InitializeAntSyncronous">
             <summary>
@@ -746,6 +776,13 @@
             <summary>
             Sets the data array for the type of sensor
             </summary>
+        </member>
+        <member name="M:AntDataReader.DataDecoder.GetDigitalVal(System.Byte)">
+            <summary>
+            Extracts the digital value bit from a data packet byte
+            </summary>
+            <param name="rawData">The byte containing the digital bit in the 000x0000 position</param>
+            <returns>1 or 0 as per the digital value</returns>
         </member>
         <member name="M:AntDataReader.DataDecoder.GetAnalogNum(System.Byte,System.Byte)">
             <summary>

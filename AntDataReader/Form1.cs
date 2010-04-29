@@ -397,6 +397,10 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Updates the label to show that the channel has been closed
+        /// </summary>
+        /// <remarks>Called remotely</remarks>
         public void OnChannelClosed()
         {
             if (!this.IsDisposed)
@@ -407,6 +411,10 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Updates the label to show that the channel has been opened
+        /// </summary>
+        /// <remarks>Called remotely</remarks>
         public void OnChannelOpened()
         {
             if (!this.IsDisposed)
@@ -418,6 +426,10 @@ namespace AntDataReader
             }
         }
 
+        /// <summary>
+        /// Called remotely to display a message
+        /// </summary>
+        /// <param name="message">The string to display</param>
         public void DisplayMessage(string message)
         {
             RemoteDisplayUpdate(message);
